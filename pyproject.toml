@@ -51,6 +51,7 @@ dev = [
     "mkdocs-material==9.4.6",
     "mkdocstrings[python]==0.23.0",
     "mypy==1.5.1",
+    "pytest==7.4.2",
     "ruff==0.0.292",
 ]
 
