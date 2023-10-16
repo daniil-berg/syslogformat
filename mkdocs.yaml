@@ -1,0 +1,48 @@
+copyright: "© 2023 Daniil Fajnberg"
+site_name: "syslogformat"
+site_description: "Python `logging.Formatter` class for syslog style messages"
+site_url: "http://daniil-berg.github.io/syslogformat"
+repo_name: "daniil-berg/syslogformat"
+repo_url: "https://github.com/daniil-berg/syslogformat"
+
+theme:
+  language: en
+  name: material
+  palette:
+  - media: "(prefers-color-scheme: light)"
+    scheme: default
+    accent: red
+    toggle:
+      icon: material/brightness-7
+      name: Switch to dark mode
+  - media: "(prefers-color-scheme: dark)"
+    scheme: slate
+    accent: red
+    toggle:
+      icon: material/brightness-4
+      name: Switch to light mode
+extra_css:
+  - css/extra.css
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            line_length: 80
+            show_source: false
+            show_root_toc_entry: false
+            separate_signature: true
+            show_signature_annotations: true
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - extra
+  - pymdownx.superfences
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md

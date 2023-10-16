@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+    tags: ['v*.*.*']
+
+jobs:
+  test:
+    name: Test
+    uses: daniil-berg/reusable-workflows/.github/workflows/python-test.yaml@v0.2.2
+    with:
+      versions: '["3.9", "3.10", "3.11", "3.12"]'
+      unittest-command: 'scripts/test.sh'
+      coverage-command: 'scripts/cov.sh'
+      unittest-requirements: "-e '.[dev]'"
+      typecheck-command: 'scripts/typecheck.sh'
+      typecheck-requirements: '-Ur requirements/dev.txt'
+      typecheck-all-versions: true
+      lint-command: 'scripts/lint.sh'
+      lint-requirements: '-Ur requirements/dev.txt'
+
+  release:
+    name: Release
+    if: ${{ github.ref_type == 'tag' }}
+    needs: test
+    uses: daniil-berg/reusable-workflows/.github/workflows/python-release.yaml@v0.2.2
+    with:
+      git-ref: ${{ github.ref_name }}
+    secrets:
+      release-token: ${{ secrets.TOKEN_GITHUB_CREATE_RELEASE }}
+      publish-token: ${{ secrets.TOKEN_PYPI_PROJECT }}
+    permissions:
+      contents: write
