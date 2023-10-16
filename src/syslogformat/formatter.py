@@ -1,8 +1,15 @@
 """Definition of the central `SyslogFormatter` class."""
 
+from __future__ import annotations
+
 from logging import Formatter, LogRecord
+from types import TracebackType
+from typing import Any, Mapping, Optional, Tuple, Type
+from typing_extensions import Literal
 
 __all__ = ["SyslogFormatter"]
+
+ExcInfo = Tuple[Type[BaseException], BaseException, Optional[TracebackType]]
 
 
 class SyslogFormatter(Formatter):
@@ -18,11 +25,19 @@ class SyslogFormatter(Formatter):
     [RFC 3164](https://datatracker.ietf.org/doc/html/rfc3164#section-4.1)
     for details about `syslog` standard.
     """
-    def __init__(self, *args, **kwargs):
+    def __init__(
+        self,
+        fmt: str | None = None,
+        datefmt: str | None = None,
+        style: Literal["%", "{", "$"] = "%",
+        validate: bool = True,
+        *,
+        defaults: Mapping[str, Any] | None = None,
+    ):
         """Validates the formatter construction arguments."""
         raise NotImplementedError
 
-    def formatException(self, exc_info) -> str:
+    def formatException(self, ei: ExcInfo | Tuple[None, None, None]) -> str:
         """Ensures that an exception message prints as a single line."""
         raise NotImplementedError
 
