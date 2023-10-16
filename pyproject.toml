@@ -79,6 +79,16 @@ strict = true
 show_error_codes = true
 plugins = []
 
+############
+# Testing: #
+
+[tool.pytest.ini_options]
+cache_dir = ".cache/pytest"
+addopts = "-ra -v"
+testpaths = [
+    "tests",
+]
+
 #######################
 # Unit test coverage: #
 
