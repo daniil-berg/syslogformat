@@ -20,14 +20,21 @@ class SyslogFormatter(Formatter):
     """
     Log formatter class for `syslog`-style log messages.
 
-    It does three things to every log message:
-    1) Prepends a `syslog` PRI part depending on the log level.
-    2) Formats exception log messages into one-liners.
-    3) Appends additional details, when a specified level is exceeded.
-
+    It ensures that a `syslog` PRI part is prepended to every log message.
+    The PRI code is calculated as the facility value (provided in the
+    constructor) multiplied by 8 plus the severity value, which is derived from
+    the level of each log record.
     See the relevant section of
     [RFC 3164](https://datatracker.ietf.org/doc/html/rfc3164#section-4.1)
     for details about `syslog` standard.
+
+    The formatter is also equipped by default to format log messages into
+    one-liners, such that for example exception messages and stack traces
+    included in a log record do not result in the message spanning multiple
+    lines in the final output.
+
+    It also makes it possible to automatically append additional details to a
+    log message, if the log record exceeds a specified level.
     """
 
     def __init__(
@@ -54,7 +61,7 @@ class SyslogFormatter(Formatter):
             fmt (optional):
                 A format string in the given `style` for the logged output as a
                 whole. The possible mapping keys are drawn from the
-                `logging.LogRecord` object’s
+                `logging.LogRecord` object's
                 [attributes]((https://docs.python.org/3/library/logging.html#logrecord-attributes).
                 If not specified, `%(message)s | %(name)s` will be used and
                 passed to the parent `__init__`. If any custom string is passed,
@@ -86,12 +93,12 @@ class SyslogFormatter(Formatter):
                 Defaults to `syslogformat.facility.USER`.
             line_break_repl (optional):
                 To prevent a single log message taking up more than one line,
-                every line-break (and consecutive whitespace) in the final log 
+                every line-break (and consecutive whitespace) in the final log
                 message will be replaced with the string provided here. This is
-                useful because log records that include exception information 
-                for example normally result in the multi-line traceback being 
+                useful because log records that include exception information
+                for example normally result in the multi-line traceback being
                 included in the log message.
-                Passing `None` disables this behavior. This means the default 
+                Passing `None` disables this behavior. This means the default
                 (multi-line) exception formatting will be used.
                 Defaults to `syslogformat.formatter.DEFAULT_LINE_BREAK_REPL`.
             detail_threshold (optional):
