@@ -39,7 +39,7 @@ class SyslogFormatter(Formatter):
         *,
         defaults: Mapping[str, Any] | None = None,
         facility: int = USER,
-        traceback_line_sep: str = DEFAULT_TRACEBACK_LINE_SEP,
+        traceback_line_sep: str | None = DEFAULT_TRACEBACK_LINE_SEP,
         detail_threshold: int = WARNING,
         prepend_level_name: bool = True,
     ) -> None:
@@ -90,6 +90,8 @@ class SyslogFormatter(Formatter):
                 To prevent a single log message taking up more than one line,
                 every line-break (and consecutive whitespace) in the exception
                 traceback will be replaced with the string provided here.
+                If passed `None`, no line-breaks will be replaced and the
+                default (multi-line) exception formatting will be used.
                 Defaults to `syslogformat.formatter.DEFAULT_TRACEBACK_LINE_SEP`.
             detail_threshold (optional):
                 Any log message with log level greater or equal to this value
