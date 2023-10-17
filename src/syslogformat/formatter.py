@@ -7,6 +7,8 @@ from types import TracebackType
 from typing import Any, Mapping, Optional, Tuple, Type
 from typing_extensions import Literal
 
+from .facility import USER
+
 __all__ = ["SyslogFormatter"]
 
 ExcInfo = Tuple[Type[BaseException], BaseException, Optional[TracebackType]]
@@ -34,7 +36,7 @@ class SyslogFormatter(Formatter):
         validate: bool = True,
         *,
         defaults: Mapping[str, Any] | None = None,
-        facility: int = 0,
+        facility: int = USER,
         detail_threshold: int = WARNING,
         prepend_level_name: bool = True,
     ) -> None:
@@ -64,12 +66,14 @@ class SyslogFormatter(Formatter):
                 Passed through to the parent `__init__`
             facility (optional):
                 Used to calculate the number in the PRI part at the very start
-                of each log message. This argument is multiplied by 8 and added
+                of each log message. This argument should be an integer between
+                0 and 24. The `facility` value is multiplied by 8 and added
                 to the numerical value of the severity that corresponds to the
                 log level of the message.
                 Details about accepted numerical values can be found in
                 [section 4.1.1](https://datatracker.ietf.org/doc/html/rfc3164#section-4.1.1)
                 of RFC 3164.
+                Defaults to `syslogformat.facility.USER`.
             detail_threshold (optional):
                 Any log message with log level greater or equal to this value
                 will have information appended to it about the module, function
