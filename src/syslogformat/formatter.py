@@ -53,17 +53,24 @@ class SyslogFormatter(Formatter):
                 whole. The possible mapping keys are drawn from the
                 `logging.LogRecord` object’s
                 [attributes]((https://docs.python.org/3/library/logging.html#logrecord-attributes).
-                If not specified, `'%(message)s | %(name)s'` is used. If any
-                custom string is passed here, the `detail_threshold` and
-                `prepend_level_name` arguments will be ignored.
+                If not specified, `%(message)s | %(name)s` will be used and
+                passed to the parent `__init__`. If any custom string is passed,
+                the `detail_threshold` and `prepend_level_name` arguments will
+                be ignored and that string is passed through unchanged to the
+                parent `__init__`.
             datefmt (optional):
-                Passed through to the parent `__init__`
+                Passed through to the parent `__init__`.
             style (optional):
-                Passed through to the parent `__init__`
+                Passed through to the parent `__init__`.
             validate (optional):
-                Passed through to the parent `__init__`
+                If `True` (default), incorrect or mismatched `fmt` and `style`
+                will raise a `ValueError`; for example,
+                `logging.Formatter('%(asctime)s - %(message)s', style='{')`.
+                Also, if `True`, a non-standard `facility` value (i.e. not
+                between 0 and 24) will raise a `ValueError`.
+                The argument is always passed through to the parent `__init__`.
             defaults (optional):
-                Passed through to the parent `__init__`
+                Passed through to the parent `__init__`.
             facility (optional):
                 Used to calculate the number in the PRI part at the very start
                 of each log message. This argument should be an integer between
