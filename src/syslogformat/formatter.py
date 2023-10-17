@@ -13,6 +13,8 @@ __all__ = ["SyslogFormatter"]
 
 ExcInfo = Tuple[Type[BaseException], BaseException, Optional[TracebackType]]
 
+DEFAULT_TRACEBACK_LINE_SEP = " --> "
+
 
 class SyslogFormatter(Formatter):
     """
@@ -37,6 +39,7 @@ class SyslogFormatter(Formatter):
         *,
         defaults: Mapping[str, Any] | None = None,
         facility: int = USER,
+        traceback_line_sep: str = DEFAULT_TRACEBACK_LINE_SEP,
         detail_threshold: int = WARNING,
         prepend_level_name: bool = True,
     ) -> None:
@@ -81,6 +84,13 @@ class SyslogFormatter(Formatter):
                 [section 4.1.1](https://datatracker.ietf.org/doc/html/rfc3164#section-4.1.1)
                 of RFC 3164.
                 Defaults to `syslogformat.facility.USER`.
+            traceback_line_sep (optional):
+                Log records that include exception information normally result
+                in the multi-line traceback being included in the log message.
+                To prevent a single log message taking up more than one line,
+                every line-break (and consecutive whitespace) in the exception
+                traceback will be replaced with the string provided here.
+                Defaults to `syslogformat.formatter.DEFAULT_TRACEBACK_LINE_SEP`.
             detail_threshold (optional):
                 Any log message with log level greater or equal to this value
                 will have information appended to it about the module, function
