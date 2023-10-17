@@ -13,7 +13,7 @@ __all__ = ["SyslogFormatter"]
 
 ExcInfo = Tuple[Type[BaseException], BaseException, Optional[TracebackType]]
 
-DEFAULT_TRACEBACK_LINE_SEP = " --> "
+DEFAULT_LINE_BREAK_REPL = " --> "
 
 
 class SyslogFormatter(Formatter):
@@ -39,7 +39,7 @@ class SyslogFormatter(Formatter):
         *,
         defaults: Mapping[str, Any] | None = None,
         facility: int = USER,
-        traceback_line_sep: str | None = DEFAULT_TRACEBACK_LINE_SEP,
+        line_break_repl: str | None = DEFAULT_LINE_BREAK_REPL,
         detail_threshold: int = WARNING,
         prepend_level_name: bool = True,
     ) -> None:
@@ -84,15 +84,16 @@ class SyslogFormatter(Formatter):
                 [section 4.1.1](https://datatracker.ietf.org/doc/html/rfc3164#section-4.1.1)
                 of RFC 3164.
                 Defaults to `syslogformat.facility.USER`.
-            traceback_line_sep (optional):
-                Log records that include exception information normally result
-                in the multi-line traceback being included in the log message.
+            line_break_repl (optional):
                 To prevent a single log message taking up more than one line,
-                every line-break (and consecutive whitespace) in the exception
-                traceback will be replaced with the string provided here.
-                If passed `None`, no line-breaks will be replaced and the
-                default (multi-line) exception formatting will be used.
-                Defaults to `syslogformat.formatter.DEFAULT_TRACEBACK_LINE_SEP`.
+                every line-break (and consecutive whitespace) in the final log 
+                message will be replaced with the string provided here. This is
+                useful because log records that include exception information 
+                for example normally result in the multi-line traceback being 
+                included in the log message.
+                Passing `None` disables this behavior. This means the default 
+                (multi-line) exception formatting will be used.
+                Defaults to `syslogformat.formatter.DEFAULT_LINE_BREAK_REPL`.
             detail_threshold (optional):
                 Any log message with log level greater or equal to this value
                 will have information appended to it about the module, function
@@ -110,16 +111,14 @@ class SyslogFormatter(Formatter):
         """
         raise NotImplementedError
 
-    def formatException(self, ei: ExcInfo | Tuple[None, None, None]) -> str:
-        """Ensures that an exception message prints as a single line."""
-        raise NotImplementedError
-
     def format(self, record: LogRecord) -> str:
         """
         Formats a record to be compliant with syslog PRI (log level/severity).
 
-        Removes the line-breaks with.
-        The entire message format is hard-coded here, so that no format needs to
-        be specified in the usual config.
+        Ensures that line-breaks in the exception message are replaced to ensure
+        it fits into a single line, unless this behavior was disabled.
+
+        Depending on the constructor arguments used when creating the instance,
+        additional information may be added to the message.
         """
         raise NotImplementedError
