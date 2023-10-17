@@ -26,10 +26,10 @@ def test_formatter_default(caplog: "LogCaptureFixture") -> None:
         log.exception("oh no")
 
     output_lines = caplog.text.splitlines()
-    assert output_lines[0] == "<7>DEBUG    | foo"
-    assert output_lines[1] == "<6>INFO     | bar"
-    assert output_lines[2] == f"<4>WARNING  | baz | {this_module_function}.22"
+    assert output_lines[0] == "<15>DEBUG    | foo"
+    assert output_lines[1] == "<14>INFO     | bar"
+    assert output_lines[2] == f"<12>WARNING  | baz | {this_module_function}.22"
     assert output_lines[3].startswith(
-        f"<3>ERROR    | oh no | {this_module_function}.26 | "
+        f"<11>ERROR    | oh no | {this_module_function}.26 | "
     )
     assert output_lines[3].endswith("ValueError: this is bad'")
