@@ -98,7 +98,7 @@ source = [
     "src/",
 ]
 branch = true
-command_line = "-m tests"
+command_line = "-m pytest"
 omit = [
     ".venv*/*",
 ]
