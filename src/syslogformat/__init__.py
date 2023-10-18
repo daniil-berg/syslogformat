@@ -1,4 +1,4 @@
-__copyright__ = "© 2023 ${REPO_OWNER_TITLE}"
+__copyright__ = "© 2023 Daniil Fajnberg"
 __license__ = """Apache-2.0
 
 Licensed under the Apache License, Version 2.0 (the "License");
