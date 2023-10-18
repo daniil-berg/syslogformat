@@ -42,7 +42,10 @@ def test___init__(mock_base___init__: MagicMock) -> None:
     assert formatter._custom_fmt is False
 
 
-def test_format() -> None:
+@patch("syslogformat.severity.log_level_severity")
+def test_format(mock_log_level_severity: MagicMock) -> None:
+    mock_log_level_severity.return_value = severity = 0
+
     formatter = SyslogFormatter()
     formatter._facility = facility = 10
     formatter._line_break_repl = "🧵"
@@ -53,27 +56,35 @@ def test_format() -> None:
 
     # Base case:
     log_record = LogRecord("test", INFO, __file__, 0, msg, None, None, "f")
-    pri = f"<{facility * 8 + 6}>"
+    pri = f"<{facility * 8 + severity}>"
     output = formatter.format(log_record)
     assert output == f"{pri}abc🧵xyz"
+    mock_log_level_severity.assert_called_once_with(INFO)
+    mock_log_level_severity.reset_mock()
 
     # Should append expected additional details:
     formatter._detail_threshold = INFO
     detail = f"{log_record.module}.{log_record.funcName}.{log_record.lineno}"
     output = formatter.format(log_record)
     assert output == f"{pri}abc🧵xyz | {detail}"
+    mock_log_level_severity.assert_called_once_with(INFO)
+    mock_log_level_severity.reset_mock()
 
     # Should prepend level name:
     formatter._prepend_level_name = True
     level_prefix = "INFO    "
     output = formatter.format(log_record)
     assert output == f"{pri}{level_prefix}| abc🧵xyz | {detail}"
+    mock_log_level_severity.assert_called_once_with(INFO)
+    mock_log_level_severity.reset_mock()
 
     # Check that spacing for level name prefix is fixed:
     log_record = LogRecord("test", DEBUG, __file__, 0, msg, None, None, "f")
     level_prefix = "DEBUG   "
     output = formatter.format(log_record)
     assert output == f"{pri}{level_prefix}| abc🧵xyz"
+    mock_log_level_severity.assert_called_once_with(DEBUG)
+    mock_log_level_severity.reset_mock()
 
     # Check that exception info is also reformatted and appended:
     try:
@@ -86,12 +97,16 @@ def test_format() -> None:
     output = formatter.format(log_record)
     assert output == f"{pri}{level_prefix}| abc🧵xyz | {exc_text_fmt}"
     assert log_record.exc_text == exc_text
+    mock_log_level_severity.assert_called_once_with(DEBUG)
+    mock_log_level_severity.reset_mock()
 
     # Check that detail comes before exception text:
     formatter._prepend_level_name = False
     formatter._detail_threshold = DEBUG
     output = formatter.format(log_record)
     assert output == f"{pri}abc🧵xyz | {detail} | {exc_text_fmt}"
+    mock_log_level_severity.assert_called_once_with(DEBUG)
+    mock_log_level_severity.reset_mock()
 
     # With custom formatting enabled, check that no details are appended and no
     # level name is prepended, but exception text is still appended:
@@ -99,6 +114,8 @@ def test_format() -> None:
     formatter._prepend_level_name = True
     output = formatter.format(log_record)
     assert output == f"{pri}abc🧵xyz | {exc_text_fmt}"
+    mock_log_level_severity.assert_called_once_with(DEBUG)
+    mock_log_level_severity.reset_mock()
 
     # Disable line-break replacement:
     formatter._line_break_repl = None
@@ -107,3 +124,5 @@ def test_format() -> None:
     assert "\n" in output
     assert output.startswith(pri)
     assert output.endswith(exc_text)
+    mock_log_level_severity.assert_called_once_with(DEBUG)
+    mock_log_level_severity.reset_mock()
