@@ -154,6 +154,7 @@ ignore = [
     "ANN101", # Missing type annotation for self in method -> unnecessary
     "ANN102", # Missing type annotation for cls in classmethod -> unnecessary
     "ANN401", # Dynamically typed expressions (typing.Any) are disallowed -> we'll use it sparingly
+    "N818",   # Exception name should be named with an Error suffix -> absolutely not
 ]
 
 [tool.ruff.per-file-ignores]
