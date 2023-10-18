@@ -10,6 +10,8 @@ import syslog
 from math import inf
 from typing import Tuple
 
+from .exceptions import CodeShouldBeUnreachable
+
 __all__ = [
     "ALERT",
     "CRITICAL",
@@ -59,4 +61,4 @@ def log_level_severity(level_num: int) -> int:
     for level_bound, severity in LOG_LEVEL_BOUND_SEVERITY:
         if level_num <= level_bound:
             return severity
-    raise AssertionError("This line should be unreachable.")
+    raise CodeShouldBeUnreachable

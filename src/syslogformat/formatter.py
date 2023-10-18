@@ -7,6 +7,7 @@ from logging import WARNING, Formatter, LogRecord
 from types import TracebackType
 from typing import TYPE_CHECKING, Any, Mapping, Optional, Tuple, Type
 
+from .exceptions import NonStandardSyslogFacility
 from .facility import USER
 from .severity import log_level_severity
 
@@ -122,7 +123,7 @@ class SyslogFormatter(Formatter):
                 If `fmt` is passed, this argument will be ignored.
         """
         if validate and facility not in range(24):
-            raise ValueError(f"Facility code invalid: {facility}")
+            raise NonStandardSyslogFacility(facility)
         self._facility = facility
         self._line_break_repl = line_break_repl
         self._detail_threshold = detail_threshold
