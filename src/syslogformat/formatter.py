@@ -2,17 +2,20 @@
 
 from __future__ import annotations
 
+import re
 from logging import WARNING, Formatter, LogRecord
 from types import TracebackType
 from typing import Any, Mapping, Optional, Tuple, Type
 from typing_extensions import Literal
 
 from .facility import USER
+from .severity import log_level_severity
 
 __all__ = ["SyslogFormatter"]
 
 ExcInfo = Tuple[Type[BaseException], BaseException, Optional[TracebackType]]
 
+LINE_BREAK_PATTERN = re.compile(r"(?:\r\n|\r|\n)\s*")
 DEFAULT_LINE_BREAK_REPL = " --> "
 
 
@@ -116,7 +119,20 @@ class SyslogFormatter(Formatter):
                 Defaults to `True`.
                 If `fmt` is passed, this argument will be ignored.
         """
-        raise NotImplementedError
+        if validate and facility not in range(0, 24):
+            raise ValueError(f"Facility code invalid: {facility}")
+        self._facility = facility
+        self._line_break_repl = line_break_repl
+        self._detail_threshold = detail_threshold
+        self._prepend_level_name = prepend_level_name
+        self._custom_fmt = fmt is not None
+        super().__init__(
+            fmt=fmt,
+            datefmt=datefmt,
+            style=style,
+            validate=validate,
+            defaults=defaults,
+        )
 
     def format(self, record: LogRecord) -> str:
         """
@@ -128,4 +144,28 @@ class SyslogFormatter(Formatter):
         Depending on the constructor arguments used when creating the instance,
         additional information may be added to the message.
         """
-        raise NotImplementedError
+        record.message = record.getMessage()
+
+        # Prepend syslog PRI:
+        severity = log_level_severity(record.levelno)
+        message = f"<{self._facility * 8 + severity}>"
+        if not self._custom_fmt and self._prepend_level_name:
+            message += f"{record.levelname:<8}| "
+        message += self.formatMessage(record)
+
+        # If record level exceeds the threshold, append additional details
+        if not self._custom_fmt and record.levelno >= self._detail_threshold:
+            message += f" | {record.module}.{record.funcName}.{record.lineno}"
+
+        # Add exception/stack info:
+        if record.exc_info and not record.exc_text:
+            record.exc_text = self.formatException(record.exc_info).strip()
+        if record.exc_text:
+            message += f"\n{record.exc_text}"
+        if record.stack_info:
+            message += f"\n{self.formatStack(record.stack_info)}"
+
+        # Replace line-breaks, if necessary:
+        if self._line_break_repl is None:
+            return message
+        return re.sub(LINE_BREAK_PATTERN, self._line_break_repl, message)

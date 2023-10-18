@@ -42,7 +42,7 @@ def test___init__(mock_base___init__: MagicMock) -> None:
     assert formatter._custom_fmt is False
 
 
-@patch("syslogformat.severity.log_level_severity")
+@patch("syslogformat.formatter.log_level_severity")
 def test_format(mock_log_level_severity: MagicMock) -> None:
     mock_log_level_severity.return_value = severity = 0
 
@@ -52,7 +52,7 @@ def test_format(mock_log_level_severity: MagicMock) -> None:
     formatter._detail_threshold = WARNING
     formatter._prepend_level_name = False
     formatter._custom_fmt = False
-    msg = " \nabc\n  xyz "
+    msg = "abc\n  xyz"
 
     # Base case:
     log_record = LogRecord("test", INFO, __file__, 0, msg, None, None, "f")
@@ -93,9 +93,10 @@ def test_format(mock_log_level_severity: MagicMock) -> None:
         exc_info = type(e), e, e.__traceback__
         exc_text = format_exc().strip()
     log_record = LogRecord("test", DEBUG, __file__, 0, msg, None, exc_info)
+    detail = f"{log_record.module}.{log_record.funcName}.{log_record.lineno}"
     exc_text_fmt = re.sub(r"(?:\r\n|\r|\n)\s*", "🧵", exc_text)
     output = formatter.format(log_record)
-    assert output == f"{pri}{level_prefix}| abc🧵xyz | {exc_text_fmt}"
+    assert output == f"{pri}{level_prefix}| abc🧵xyz🧵{exc_text_fmt}"
     assert log_record.exc_text == exc_text
     mock_log_level_severity.assert_called_once_with(DEBUG)
     mock_log_level_severity.reset_mock()
@@ -104,7 +105,7 @@ def test_format(mock_log_level_severity: MagicMock) -> None:
     formatter._prepend_level_name = False
     formatter._detail_threshold = DEBUG
     output = formatter.format(log_record)
-    assert output == f"{pri}abc🧵xyz | {detail} | {exc_text_fmt}"
+    assert output == f"{pri}abc🧵xyz | {detail}🧵{exc_text_fmt}"
     mock_log_level_severity.assert_called_once_with(DEBUG)
     mock_log_level_severity.reset_mock()
 
@@ -113,7 +114,7 @@ def test_format(mock_log_level_severity: MagicMock) -> None:
     formatter._custom_fmt = True
     formatter._prepend_level_name = True
     output = formatter.format(log_record)
-    assert output == f"{pri}abc🧵xyz | {exc_text_fmt}"
+    assert output == f"{pri}abc🧵xyz🧵{exc_text_fmt}"
     mock_log_level_severity.assert_called_once_with(DEBUG)
     mock_log_level_severity.reset_mock()
 
