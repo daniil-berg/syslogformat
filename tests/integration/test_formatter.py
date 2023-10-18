@@ -1,20 +1,20 @@
 import logging
-from typing import TYPE_CHECKING
+from io import StringIO
+from pathlib import Path
 
 from syslogformat.formatter import SyslogFormatter
 
-if TYPE_CHECKING:
-    from _pytest.logging import LogCaptureFixture
 
-
-def test_formatter_default(caplog: "LogCaptureFixture") -> None:
-    this_module_function = f"{__name__}.{test_formatter_default.__name__}"
+def test_formatter_default() -> None:
+    this_module = Path(__file__).stem
+    this_module_function = f"{this_module}.{test_formatter_default.__name__}"
     log = logging.getLogger()
-    hdl = logging.StreamHandler()
-    fmt = SyslogFormatter()
-    hdl.setFormatter(fmt)
-    hdl.setLevel(logging.NOTSET)
-    log.addHandler(hdl)
+    log_stream = StringIO()
+    stream_handler = logging.StreamHandler(stream=log_stream)
+    syslog_formatter = SyslogFormatter()
+    stream_handler.setFormatter(syslog_formatter)
+    stream_handler.setLevel(logging.NOTSET)
+    log.addHandler(stream_handler)
     log.setLevel(logging.NOTSET)
 
     log.debug("foo")
@@ -25,11 +25,11 @@ def test_formatter_default(caplog: "LogCaptureFixture") -> None:
     except ValueError:
         log.exception("oh no")
 
-    output_lines = caplog.text.splitlines()
-    assert output_lines[0] == "<15>DEBUG    | foo"
-    assert output_lines[1] == "<14>INFO     | bar"
-    assert output_lines[2] == f"<12>WARNING  | baz | {this_module_function}.22"
+    output_lines = log_stream.getvalue().splitlines()
+    assert output_lines[0] == "<15>DEBUG   | foo"
+    assert output_lines[1] == "<14>INFO    | bar"
+    assert output_lines[2] == f"<12>WARNING | baz | {this_module_function}.22"
     assert output_lines[3].startswith(
-        f"<11>ERROR    | oh no | {this_module_function}.26 | "
+        f"<11>ERROR   | oh no | {this_module_function}.26 --> "
     )
-    assert output_lines[3].endswith("ValueError: this is bad'")
+    assert output_lines[3].endswith(" --> ValueError: this is bad")
