@@ -10,20 +10,22 @@ from syslogformat.formatter import SyslogFormatter
 
 @patch.object(Formatter, "__init__")
 def test___init__(mock_base___init__: MagicMock) -> None:
+    facility = 8
+    detail_threshold = 10
     formatter = SyslogFormatter(
         fmt="foo",
         datefmt="bar",
         style="$",
         validate=True,
         defaults={"a": 1},
-        facility=8,
+        facility=facility,
         line_break_repl=" ",
-        detail_threshold=10,
+        detail_threshold=detail_threshold,
         prepend_level_name=False,
     )
-    assert formatter._facility == 8
+    assert formatter._facility == facility
     assert formatter._line_break_repl == " "
-    assert formatter._detail_threshold == 10
+    assert formatter._detail_threshold == detail_threshold
     assert formatter._prepend_level_name is False
     assert formatter._custom_fmt is True
     mock_base___init__.assert_called_once_with(
@@ -33,12 +35,14 @@ def test___init__(mock_base___init__: MagicMock) -> None:
         validate=True,
         defaults={"a": 1},
     )
+    facility = -1
     with pytest.raises(ValueError):
-        SyslogFormatter(facility=-1)
+        SyslogFormatter(facility=facility)
+    facility = 25
     with pytest.raises(ValueError):
-        SyslogFormatter(facility=25)
-    formatter = SyslogFormatter(validate=False, facility=25)
-    assert formatter._facility == 25
+        SyslogFormatter(facility=facility)
+    formatter = SyslogFormatter(validate=False, facility=facility)
+    assert formatter._facility == facility
     assert formatter._custom_fmt is False
 
 

@@ -5,11 +5,13 @@ from __future__ import annotations
 import re
 from logging import WARNING, Formatter, LogRecord
 from types import TracebackType
-from typing import Any, Mapping, Optional, Tuple, Type
-from typing_extensions import Literal
+from typing import TYPE_CHECKING, Any, Mapping, Optional, Tuple, Type
 
 from .facility import USER
 from .severity import log_level_severity
+
+if TYPE_CHECKING:
+    from typing_extensions import Literal
 
 __all__ = ["SyslogFormatter"]
 
@@ -40,7 +42,7 @@ class SyslogFormatter(Formatter):
     log message, if the log record exceeds a specified level.
     """
 
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         fmt: str | None = None,
         datefmt: str | None = None,
@@ -119,7 +121,7 @@ class SyslogFormatter(Formatter):
                 Defaults to `True`.
                 If `fmt` is passed, this argument will be ignored.
         """
-        if validate and facility not in range(0, 24):
+        if validate and facility not in range(24):
             raise ValueError(f"Facility code invalid: {facility}")
         self._facility = facility
         self._line_break_repl = line_break_repl
@@ -169,3 +171,7 @@ class SyslogFormatter(Formatter):
         if self._line_break_repl is None:
             return message
         return re.sub(LINE_BREAK_PATTERN, self._line_break_repl, message)
+
+
+# We must violate those because they are violated in the base `Formatter` class:
+# ruff: noqa: FBT001, FBT002, A003
