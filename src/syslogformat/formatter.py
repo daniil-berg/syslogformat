@@ -17,7 +17,6 @@ if TYPE_CHECKING:
 __all__ = ["SyslogFormatter"]
 
 LINE_BREAK_PATTERN = re.compile(r"(?:\r\n|\r|\n)\s*")
-DEFAULT_LINE_BREAK_REPL = " --> "
 
 
 class SyslogFormatter(Formatter):
@@ -50,7 +49,7 @@ class SyslogFormatter(Formatter):
         *,
         defaults: Mapping[str, Any] | None = None,
         facility: int = USER,
-        line_break_repl: str | None = DEFAULT_LINE_BREAK_REPL,
+        line_break_repl: str | None = " --> ",
         detail_threshold: int | str = WARNING,
         prepend_level_name: bool = True,
     ) -> None:
@@ -66,26 +65,28 @@ class SyslogFormatter(Formatter):
                 A format string in the given `style` for the logged output as a
                 whole. The possible mapping keys are drawn from the
                 `logging.LogRecord` object's
-                [attributes]((https://docs.python.org/3/library/logging.html#logrecord-attributes).
-                If not specified, `%(message)s | %(name)s` will be used and
-                passed to the parent `__init__`. If any custom string is passed,
-                the `detail_threshold` and `prepend_level_name` arguments will
-                be ignored and that string is passed through unchanged to the
-                parent `__init__`.
+                [attributes](https://docs.python.org/3/library/logging.html#logrecord-attributes).
+                By default `%(message)s | %(name)s` will be used and passed to
+                the parent [`__init__`][logging.Formatter]. If any custom string
+                is passed, the `detail_threshold` and `prepend_level_name`
+                arguments will be ignored and that string is passed through
+                unchanged to the parent [`__init__`][logging.Formatter].
             datefmt (optional):
-                Passed through to the parent `__init__`.
+                Passed through to the parent [`__init__`][logging.Formatter].
             style (optional):
-                Passed through to the parent `__init__`.
+                Passed through to the parent [`__init__`][logging.Formatter].
             validate (optional):
                 If `True` (default), incorrect or mismatched `fmt` and `style`
                 will raise a `ValueError`; for example,
                 `logging.Formatter('%(asctime)s - %(message)s', style='{')`.
                 Also, if `True`, a non-standard `facility` value (i.e. not
-                between 0 and 24) will raise a `ValueError`.
-                The argument is always passed through to the parent `__init__`.
+                between 0 and 24) will raise a
+                [`NonStandardSyslogFacility`][syslogformat.exceptions.NonStandardSyslogFacility]
+                error. The argument is always passed through to the parent
+                [`__init__`][logging.Formatter].
             defaults (optional):
-                Passed through to the parent `__init__` on Python `>=3.10`.
-                Ignored on Python `<3.10`.
+                Passed through to the parent [`__init__`][logging.Formatter]
+                on Python `>=3.10`. Ignored on Python `<3.10`.
             facility (optional):
                 Used to calculate the number in the PRI part at the very start
                 of each log message. This argument should be an integer between
@@ -95,7 +96,7 @@ class SyslogFormatter(Formatter):
                 Details about accepted numerical values can be found in
                 [section 4.1.1](https://datatracker.ietf.org/doc/html/rfc3164#section-4.1.1)
                 of RFC 3164.
-                Defaults to `syslogformat.facility.USER`.
+                Defaults to [`USER`][syslogformat.facility.USER].
             line_break_repl (optional):
                 To prevent a single log message taking up more than one line,
                 every line-break (and consecutive whitespace) in the final log
@@ -105,7 +106,7 @@ class SyslogFormatter(Formatter):
                 included in the log message.
                 Passing `None` disables this behavior. This means the default
                 (multi-line) exception formatting will be used.
-                Defaults to `syslogformat.formatter.DEFAULT_LINE_BREAK_REPL`.
+                Defaults to `' --> '`.
             detail_threshold (optional):
                 Any log message with log level greater or equal to this value
                 will have information appended to it about the module, function
@@ -147,6 +148,12 @@ class SyslogFormatter(Formatter):
 
         Depending on the constructor arguments used when creating the instance,
         additional information may be added to the message.
+
+        Args:
+            record: The [`logging.LogRecord`][] to format as text
+
+        Returns:
+            The final log message constructed from the log record
         """
         record.message = record.getMessage()
 
