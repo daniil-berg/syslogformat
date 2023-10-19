@@ -16,7 +16,10 @@ limitations under the License."""
 __version__ = "0.0.1"
 
 __doc__ = """
-PLACEHOLDER
+Python `logging.Formatter` class for `syslog` style messages.
+
+In addition to the meta information provided above, this module also provides
+convenience imports of the main class from the top-level package.
 """
 
 from .formatter import SyslogFormatter
