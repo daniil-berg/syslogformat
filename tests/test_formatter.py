@@ -72,7 +72,7 @@ def mock_get_syslog_pri_part() -> Iterator[MagicMock]:
 @pytest.fixture
 def make_syslog_formatter() -> Callable[[str], SyslogFormatter]:
     def _make_syslog_formatter(line_break_repl: str) -> SyslogFormatter:
-        formatter = SyslogFormatter()
+        formatter = SyslogFormatter("%(message)s")
         formatter._facility = TEST_FACILITY
         formatter._line_break_repl = line_break_repl
         formatter._detail_threshold = WARNING

@@ -55,10 +55,10 @@ except ValueError as e:
 This will send the following to your stdout:
 
 ```
-<15>DEBUG   | foo
-<14>INFO    | bar
-<12>WARNING | baz | __init__.<module>.24
-<11>ERROR   | oof | __init__.<module>.28 --> Traceback (most recent call last): --> File "/path/to/module.py", line 26, in <module> --> raise ValueError("this is bad") --> ValueError: this is bad
+<15>DEBUG   | foo | root
+<14>INFO    | bar | root
+<12>WARNING | baz | root | __init__.<module>.24
+<11>ERROR   | oof | root | __init__.<module>.28 --> Traceback (most recent call last): --> File "/path/to/module.py", line 26, in <module> --> raise ValueError("this is bad") --> ValueError: this is bad
 ```
 
 ### The `PRI` prefix
@@ -71,8 +71,16 @@ The `PRI` code is calculated by multiplying the facility by 8 and adding the sev
 Programs like **`systemd-journald`** hide the `PRI` part in their output, but interpret it behind the scenes to allow things like highlighting messages of a certain level a different color and filtering by severity.
 
 By default the facility code `1` is used, which indicates user-level messages, but this can be easily configured (see below).
-Since a `DEBUG` log message corresponds to a severity of `7`, the resulting `PRI` part of the first log message is `<15>` (since `1 * 8 + 7 == 15`).
+Since a `DEBUG` log message corresponds to a severity of `7`, the resulting `PRI` part of the first log message in the example above is `<15>` (since `1 * 8 + 7 == 15`).
 An `ERROR` has the severity `3`, so that message has the `PRI` part `<11>`.
+
+### Default message format
+
+By default the message format of the `SyslogFormatter` is `%(message)s | %(name)s` for messages with a log level below `WARNING`, and `%(message)s | %(name)s | %(module)s.%(funcName)s.%(lineno)s` for messages with a higher log level.
+
+In addition, all line-breaks (including those in the exception traceback) are replaced with ` --> ` by default.
+
+All of this can be easily changed and configured to fit your needs (see below).
 
 ### Configuration options
 
