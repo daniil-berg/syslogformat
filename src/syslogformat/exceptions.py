@@ -13,12 +13,12 @@ class NonStandardSyslogFacility(ValueError, SyslogFormatError):
         super().__init__(f"Syslog facility code invalid: {facility}")
 
 
-class InvalidLogLevelThreshold(SyslogFormatError):
-    """Used when the detail threshold specified is not a valid log level."""
+class InvalidLogLevel(SyslogFormatError):
+    """Used when a log level is not an integer and not a registered name."""
 
     def __init__(self, value: object) -> None:
-        """Initialized with the faulty log level value passed for threshold."""
-        super().__init__(f"Detail threshold is not a valid log level: {value}")
+        """Initialized with the faulty log level."""
+        super().__init__(f"Not a valid log level: {value}")
 
 
 class CodeShouldBeUnreachable(AssertionError, SyslogFormatError):

@@ -2,7 +2,7 @@
 
 from logging import getLevelNamesMapping
 
-from .exceptions import InvalidLogLevelThreshold
+from .exceptions import InvalidLogLevel
 from .facility import USER
 from .severity import log_level_severity
 
@@ -22,7 +22,7 @@ def normalize_log_level(level: int | str) -> int:
         Valid log level number.
 
     Raises:
-        `InvalidLogLevelThreshold`:
+        `InvalidLogLevel`:
             If `level` is a string that is not present in the keys of the
             level-name-mapping of the `logging` module.
     """
@@ -30,7 +30,7 @@ def normalize_log_level(level: int | str) -> int:
         return level
     level_num = getLevelNamesMapping().get(level)
     if level_num is None:
-        raise InvalidLogLevelThreshold(level)
+        raise InvalidLogLevel(level)
     return level_num
 
 
