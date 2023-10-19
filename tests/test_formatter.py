@@ -2,7 +2,7 @@ import re
 from logging import DEBUG, INFO, WARNING, Formatter, LogRecord
 from traceback import format_exc
 from types import TracebackType
-from typing import Callable, Optional, Protocol, Tuple, Type
+from typing import Callable, Iterator, Optional, Protocol, Tuple, Type
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -56,7 +56,7 @@ TEST_PRI = f"<{TEST_FACILITY_VALUE * 8 + TEST_SEVERITY_VALUE}>"
 
 
 @pytest.fixture
-def mock_log_level_severity() -> MagicMock:
+def mock_log_level_severity() -> Iterator[MagicMock]:
     patcher = patch("syslogformat.formatter.log_level_severity")
     mock_function = patcher.start()
     mock_function.return_value = TEST_SEVERITY_VALUE
