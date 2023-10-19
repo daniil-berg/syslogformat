@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, Any, Mapping, Optional, Tuple, Type
 
 from .exceptions import NonStandardSyslogFacility
 from .facility import USER
-from .severity import log_level_severity
+from .helpers import get_syslog_pri_part, normalize_log_level
 
 if TYPE_CHECKING:
     from typing_extensions import Literal
@@ -53,7 +53,7 @@ class SyslogFormatter(Formatter):
         defaults: Mapping[str, Any] | None = None,
         facility: int = USER,
         line_break_repl: str | None = DEFAULT_LINE_BREAK_REPL,
-        detail_threshold: int = WARNING,
+        detail_threshold: int | str = WARNING,
         prepend_level_name: bool = True,
     ) -> None:
         """
@@ -126,7 +126,7 @@ class SyslogFormatter(Formatter):
             raise NonStandardSyslogFacility(facility)
         self._facility = facility
         self._line_break_repl = line_break_repl
-        self._detail_threshold = detail_threshold
+        self._detail_threshold = normalize_log_level(detail_threshold)
         self._prepend_level_name = prepend_level_name
         self._custom_fmt = fmt is not None
         super().__init__(
@@ -150,8 +150,7 @@ class SyslogFormatter(Formatter):
         record.message = record.getMessage()
 
         # Prepend syslog PRI:
-        severity = log_level_severity(record.levelno)
-        message = f"<{self._facility * 8 + severity}>"
+        message = get_syslog_pri_part(record.levelno, self._facility)
         if not self._custom_fmt and self._prepend_level_name:
             message += f"{record.levelname:<8}| "
         message += self.formatMessage(record)

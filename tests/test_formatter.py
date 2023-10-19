@@ -50,16 +50,15 @@ def test___init__(mock_base___init__: MagicMock) -> None:
     assert formatter._custom_fmt is False
 
 
-TEST_FACILITY_VALUE = 10
-TEST_SEVERITY_VALUE = 1
-TEST_PRI = f"<{TEST_FACILITY_VALUE * 8 + TEST_SEVERITY_VALUE}>"
+TEST_FACILITY = 10
+TEST_PRI = "<42>"
 
 
 @pytest.fixture
-def mock_log_level_severity() -> Iterator[MagicMock]:
-    patcher = patch("syslogformat.formatter.log_level_severity")
+def mock_get_syslog_pri_part() -> Iterator[MagicMock]:
+    patcher = patch("syslogformat.formatter.get_syslog_pri_part")
     mock_function = patcher.start()
-    mock_function.return_value = TEST_SEVERITY_VALUE
+    mock_function.return_value = TEST_PRI
     yield mock_function
     patcher.stop()
 
@@ -68,7 +67,7 @@ def mock_log_level_severity() -> Iterator[MagicMock]:
 def make_syslog_formatter() -> Callable[[str], SyslogFormatter]:
     def _make_syslog_formatter(line_break_repl: str) -> SyslogFormatter:
         formatter = SyslogFormatter()
-        formatter._facility = TEST_FACILITY_VALUE
+        formatter._facility = TEST_FACILITY
         formatter._line_break_repl = line_break_repl
         formatter._detail_threshold = WARNING
         formatter._prepend_level_name = False
@@ -121,7 +120,7 @@ def exc_info_and_text() -> Tuple[ExcInfo, str]:
 
 
 def test_format__base_case(
-    mock_log_level_severity: MagicMock,
+    mock_get_syslog_pri_part: MagicMock,
     make_syslog_formatter: Callable[[str], SyslogFormatter],
     make_log_record: LogRecordFixture,
 ) -> None:
@@ -131,11 +130,11 @@ def test_format__base_case(
 
     output = formatter.format(log_record)
     assert output == f"{TEST_PRI}abc🧵xyz"
-    mock_log_level_severity.assert_called_once_with(INFO)
+    mock_get_syslog_pri_part.assert_called_once_with(INFO, TEST_FACILITY)
 
 
 def test_format__threshold_exceeded(
-    mock_log_level_severity: MagicMock,
+    mock_get_syslog_pri_part: MagicMock,
     make_syslog_formatter: Callable[[str], SyslogFormatter],
     make_log_record: LogRecordFixture,
 ) -> None:
@@ -147,11 +146,11 @@ def test_format__threshold_exceeded(
 
     output = formatter.format(log_record)
     assert output == f"{TEST_PRI}abc🌐xyz | {detail}"
-    mock_log_level_severity.assert_called_once_with(INFO)
+    mock_get_syslog_pri_part.assert_called_once_with(INFO, TEST_FACILITY)
 
 
 def test_format__prepend_level_name(
-    mock_log_level_severity: MagicMock,
+    mock_get_syslog_pri_part: MagicMock,
     make_syslog_formatter: Callable[[str], SyslogFormatter],
     make_log_record: LogRecordFixture,
 ) -> None:
@@ -162,19 +161,19 @@ def test_format__prepend_level_name(
 
     output = formatter.format(log_record)
     assert output == f"{TEST_PRI}INFO    | abc💡xyz"
-    mock_log_level_severity.assert_called_once_with(INFO)
-    mock_log_level_severity.reset_mock()
+    mock_get_syslog_pri_part.assert_called_once_with(INFO, TEST_FACILITY)
+    mock_get_syslog_pri_part.reset_mock()
 
     # Check that spacing for level name prefix is fixed:
     log_record = make_log_record(DEBUG, msg)
 
     output = formatter.format(log_record)
     assert output == f"{TEST_PRI}DEBUG   | abc💡xyz"
-    mock_log_level_severity.assert_called_once_with(DEBUG)
+    mock_get_syslog_pri_part.assert_called_once_with(DEBUG, TEST_FACILITY)
 
 
 def test_format__with_exception(
-    mock_log_level_severity: MagicMock,
+    mock_get_syslog_pri_part: MagicMock,
     make_syslog_formatter: Callable[[str], SyslogFormatter],
     make_log_record: LogRecordFixture,
     exc_info_and_text: Tuple[ExcInfo, str],
@@ -188,8 +187,8 @@ def test_format__with_exception(
     output = formatter.format(log_record)
     assert output == f"{TEST_PRI}abc💥xyz💥{exc_text_fmt}"
     assert log_record.exc_text == exc_text
-    mock_log_level_severity.assert_called_once_with(DEBUG)
-    mock_log_level_severity.reset_mock()
+    mock_get_syslog_pri_part.assert_called_once_with(DEBUG, TEST_FACILITY)
+    mock_get_syslog_pri_part.reset_mock()
 
     # Check that detail comes before exception text:
     formatter._prepend_level_name = False
@@ -198,11 +197,11 @@ def test_format__with_exception(
 
     output = formatter.format(log_record)
     assert output == f"{TEST_PRI}abc💥xyz | {detail}💥{exc_text_fmt}"
-    mock_log_level_severity.assert_called_once_with(DEBUG)
+    mock_get_syslog_pri_part.assert_called_once_with(DEBUG, TEST_FACILITY)
 
 
 def test_format__custom_formatting_override(
-    mock_log_level_severity: MagicMock,
+    mock_get_syslog_pri_part: MagicMock,
     make_syslog_formatter: Callable[[str], SyslogFormatter],
     make_log_record: LogRecordFixture,
     exc_info_and_text: Tuple[ExcInfo, str],
@@ -218,11 +217,11 @@ def test_format__custom_formatting_override(
 
     output = formatter.format(log_record)
     assert output == f"{TEST_PRI}abc🧱xyz🧱{exc_text_fmt}"
-    mock_log_level_severity.assert_called_once_with(WARNING)
+    mock_get_syslog_pri_part.assert_called_once_with(WARNING, TEST_FACILITY)
 
 
 def test_format__with_stack_info(
-    mock_log_level_severity: MagicMock,
+    mock_get_syslog_pri_part: MagicMock,
     make_syslog_formatter: Callable[[str], SyslogFormatter],
     make_log_record: LogRecordFixture,
 ) -> None:
@@ -232,11 +231,11 @@ def test_format__with_stack_info(
 
     output = formatter.format(log_record)
     assert output == f"{TEST_PRI}abc💥xyz💥foo💥bar"
-    mock_log_level_severity.assert_called_once_with(DEBUG)
+    mock_get_syslog_pri_part.assert_called_once_with(DEBUG, TEST_FACILITY)
 
 
 def test_format__no_line_break_replacement(
-    mock_log_level_severity: MagicMock,
+    mock_get_syslog_pri_part: MagicMock,
     make_syslog_formatter: Callable[[str], SyslogFormatter],
     make_log_record: LogRecordFixture,
     exc_info_and_text: Tuple[ExcInfo, str],
@@ -252,4 +251,4 @@ def test_format__no_line_break_replacement(
     assert "\n" in output
     assert output.startswith(TEST_PRI + msg)
     assert output.endswith(exc_text)
-    mock_log_level_severity.assert_called_once_with(WARNING)
+    mock_get_syslog_pri_part.assert_called_once_with(WARNING, TEST_FACILITY)
