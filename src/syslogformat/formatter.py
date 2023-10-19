@@ -17,6 +17,11 @@ if TYPE_CHECKING:
 __all__ = ["SyslogFormatter"]
 
 LINE_BREAK_PATTERN = re.compile(r"(?:\r\n|\r|\n)\s*")
+DEFAULT_FORMAT = {
+    "%": "%(message)s | %(name)s",
+    "{": "{messages} | {name}",
+    "$": "${messages} | ${name}",
+}
 
 
 class SyslogFormatter(Formatter):
@@ -133,7 +138,11 @@ class SyslogFormatter(Formatter):
         self._line_break_repl = line_break_repl
         self._detail_threshold = normalize_log_level(detail_threshold)
         self._prepend_level_name = prepend_level_name
-        self._custom_fmt = fmt is not None
+        if fmt is None:
+            self._custom_fmt = False
+            fmt = DEFAULT_FORMAT[style]
+        else:
+            self._custom_fmt = True
         if sys.version_info < (3, 10):
             super().__init__(fmt, datefmt, style, validate)
         else:
