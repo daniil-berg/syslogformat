@@ -4,17 +4,19 @@ from __future__ import annotations
 
 import logging
 import sys
-from typing import Callable, Dict
+from typing import Dict
 
 from .exceptions import InvalidLogLevel
 from .facility import USER
 from .severity import log_level_severity
 
 
-def get_level_name_mapping() -> Dict[str, int]:
+def _get_level_name_mapping() -> Dict[str, int]:
+    """Hack duplicating `logging.getLevelNamesMapping` for Python `<3.11`."""
     return logging._nameToLevel.copy()
 
 
+get_level_name_mapping = _get_level_name_mapping
 if sys.version_info >= (3, 11):
     get_level_name_mapping = logging.getLevelNamesMapping
 

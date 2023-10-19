@@ -7,6 +7,13 @@ from syslogformat import helpers
 from syslogformat.exceptions import InvalidLogLevel
 
 
+def test__get_level_name_mapping() -> None:
+    mock_name_to_level_map = {"foo": 1, "bar": 2}
+    with patch("logging._nameToLevel", new=mock_name_to_level_map):
+        assert helpers._get_level_name_mapping() == mock_name_to_level_map
+        assert helpers._get_level_name_mapping() is not mock_name_to_level_map
+
+
 def test_normalize_log_level() -> None:
     assert helpers.normalize_log_level(1) == 1
     assert helpers.normalize_log_level(1000) == 1000  # noqa: PLR2004
