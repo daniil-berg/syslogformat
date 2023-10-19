@@ -166,7 +166,7 @@ class SyslogFormatter(Formatter):
         if record.exc_text:
             message += f"\n{record.exc_text}"
         if record.stack_info:
-            message += f"\n{self.formatStack(record.stack_info)}"
+            message += f"\n{self.formatStack(record.stack_info).strip()}"
 
         # Replace line-breaks, if necessary:
         if self._line_break_repl is None:
