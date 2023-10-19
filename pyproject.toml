@@ -109,6 +109,7 @@ exclude_lines = [
     "if TYPE_CHECKING:",
     '''if __name__ == ['"]__main__['"]:''',
     "@overload",
+    "if .*?sys.version.*:",
 ]
 omit = [
     "tests/*",
@@ -169,6 +170,7 @@ ignore = [
     "D103",  # Missing docstring in public function
     "D104",  # Missing docstring in public package
     "S101",  # Use of `assert` detected
+    "FBT",   # flake8-boolean-trap
     "TRY",   # tryceratops
 ]
 
