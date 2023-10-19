@@ -121,6 +121,11 @@ class SyslogFormatter(Formatter):
                 characters of the part before the `|`).
                 Defaults to `True`.
                 If `fmt` is passed, this argument will be ignored.
+
+        Raises:
+            NonStandardSyslogFacility:
+                If `validate` was set to `True` and the `facility` passed was
+                not an integer between 0 and 23.
         """
         if validate and facility not in range(24):
             raise NonStandardSyslogFacility(facility)

@@ -22,7 +22,7 @@ def normalize_log_level(level: int | str) -> int:
         Valid log level number.
 
     Raises:
-        `InvalidLogLevel`:
+        InvalidLogLevel:
             If `level` is a string that is not present in the keys of the
             level-name-mapping of the `logging` module.
     """

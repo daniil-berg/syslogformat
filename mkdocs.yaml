@@ -35,6 +35,8 @@ plugins:
             show_root_toc_entry: false
             separate_signature: true
             show_signature_annotations: true
+          import:
+            - https://docs.python.org/3/objects.inv
 
 markdown_extensions:
   - admonition
@@ -46,3 +48,9 @@ markdown_extensions:
 
 nav:
   - Home: index.md
+  - 'API Reference':
+    - api_reference/exceptions.md
+    - api_reference/facility.md
+    - api_reference/formatter.md
+    - api_reference/helpers.md
+    - api_reference/severity.md
