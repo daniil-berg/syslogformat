@@ -107,8 +107,8 @@ log_config = {
             "()": "syslogformat.SyslogFormatter",
             "format": "$message [$name]",
             "style": "$",
-            "facility": 16,             # <-- specific to syslogformat
-            "line_break_repl": " 🚀 ",  # <-- specific to syslogformat
+            "facility": 16,
+            "line_break_repl": " 🚀 ",
         }
     },
     "handlers": {
