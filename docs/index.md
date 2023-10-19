@@ -135,7 +135,7 @@ Output:
 
 ## Dependencies
 
-Python Version 3.7+, OS agnostic
+Python `3.8` or greater, OS agnostic
 
 
 [1]: https://daniil-berg.github.io/syslogformat
