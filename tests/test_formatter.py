@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import re
+import sys
 from logging import DEBUG, INFO, WARNING, Formatter, LogRecord
 from traceback import format_exc
 from types import TracebackType
@@ -32,13 +35,16 @@ def test___init__(mock_base___init__: MagicMock) -> None:
     assert formatter._detail_threshold == detail_threshold
     assert formatter._prepend_level_name is False
     assert formatter._custom_fmt is True
-    mock_base___init__.assert_called_once_with(
-        fmt="foo",
-        datefmt="bar",
-        style="$",
-        validate=True,
-        defaults={"a": 1},
-    )
+    if sys.version_info >= (3, 10):
+        mock_base___init__.assert_called_once_with(
+            "foo",
+            "bar",
+            "$",
+            True,
+            defaults={"a": 1},
+        )
+    else:
+        mock_base___init__.assert_called_once_with("foo", "bar", "$", True)
     facility = -1
     with pytest.raises(ValueError):
         SyslogFormatter(facility=facility)

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+import sys
 from logging import WARNING, Formatter, LogRecord
 from typing import TYPE_CHECKING, Any, Mapping
 
@@ -83,7 +84,8 @@ class SyslogFormatter(Formatter):
                 between 0 and 24) will raise a `ValueError`.
                 The argument is always passed through to the parent `__init__`.
             defaults (optional):
-                Passed through to the parent `__init__`.
+                Passed through to the parent `__init__` on Python `>=3.10`.
+                Ignored on Python `<3.10`.
             facility (optional):
                 Used to calculate the number in the PRI part at the very start
                 of each log message. This argument should be an integer between
@@ -131,13 +133,10 @@ class SyslogFormatter(Formatter):
         self._detail_threshold = normalize_log_level(detail_threshold)
         self._prepend_level_name = prepend_level_name
         self._custom_fmt = fmt is not None
-        super().__init__(
-            fmt=fmt,
-            datefmt=datefmt,
-            style=style,
-            validate=validate,
-            defaults=defaults,
-        )
+        if sys.version_info < (3, 10):
+            super().__init__(fmt, datefmt, style, validate)
+        else:
+            super().__init__(fmt, datefmt, style, validate, defaults=defaults)
 
     def format(self, record: LogRecord) -> str:
         """

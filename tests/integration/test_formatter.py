@@ -8,7 +8,7 @@ from syslogformat import SyslogFormatter
 
 THIS_MODULE = Path(__file__).stem
 
-log = logging.getLogger("root")
+log = logging.getLogger()
 
 
 def test_formatter_default() -> None:

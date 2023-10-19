@@ -1,10 +1,22 @@
 """A few helper functions for dealing with log levels, severities and so on."""
 
-from logging import getLevelNamesMapping
+from __future__ import annotations
+
+import logging
+import sys
+from typing import Callable, Dict
 
 from .exceptions import InvalidLogLevel
 from .facility import USER
 from .severity import log_level_severity
+
+
+def get_level_name_mapping() -> Dict[str, int]:
+    return logging._nameToLevel.copy()
+
+
+if sys.version_info >= (3, 11):
+    get_level_name_mapping = logging.getLevelNamesMapping
 
 
 def normalize_log_level(level: int | str) -> int:
@@ -28,7 +40,7 @@ def normalize_log_level(level: int | str) -> int:
     """
     if isinstance(level, int):
         return level
-    level_num = getLevelNamesMapping().get(level)
+    level_num = get_level_name_mapping().get(level)
     if level_num is None:
         raise InvalidLogLevel(level)
     return level_num
