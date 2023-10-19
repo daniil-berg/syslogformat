@@ -117,7 +117,7 @@ class SyslogFormatter(Formatter):
             prepend_level_name (optional):
                 If `True`, the log level name will be prepended to every log
                 message (but _after_ the `syslog` PRI part). The prefix will
-                have the form `{levelname} | ` (with a fixed width of 9
+                have the form `{levelname} | ` (with a fixed width of 8
                 characters of the part before the `|`).
                 Defaults to `True`.
                 If `fmt` is passed, this argument will be ignored.
