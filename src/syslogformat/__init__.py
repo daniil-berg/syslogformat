@@ -18,3 +18,11 @@ __version__ = "0.0.1"
 __doc__ = """
 PLACEHOLDER
 """
+
+from .formatter import SyslogFormatter
+from .severity import log_level_severity
+
+__all__ = [
+    "SyslogFormatter",
+    "log_level_severity",
+]
