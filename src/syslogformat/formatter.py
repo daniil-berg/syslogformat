@@ -4,8 +4,7 @@ from __future__ import annotations
 
 import re
 from logging import WARNING, Formatter, LogRecord
-from types import TracebackType
-from typing import TYPE_CHECKING, Any, Mapping, Optional, Tuple, Type
+from typing import TYPE_CHECKING, Any, Mapping
 
 from .exceptions import NonStandardSyslogFacility
 from .facility import USER
@@ -15,8 +14,6 @@ if TYPE_CHECKING:
     from typing_extensions import Literal
 
 __all__ = ["SyslogFormatter"]
-
-ExcInfo = Tuple[Type[BaseException], BaseException, Optional[TracebackType]]
 
 LINE_BREAK_PATTERN = re.compile(r"(?:\r\n|\r|\n)\s*")
 DEFAULT_LINE_BREAK_REPL = " --> "
