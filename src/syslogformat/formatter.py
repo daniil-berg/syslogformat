@@ -56,7 +56,6 @@ class SyslogFormatter(Formatter):
         facility: int = USER,
         line_break_repl: str | None = " --> ",
         detail_threshold: int | str = WARNING,
-        prepend_level_name: bool = True,
     ) -> None:
         """
         Validates the added formatter constructor arguments.
@@ -73,9 +72,9 @@ class SyslogFormatter(Formatter):
                 [attributes](https://docs.python.org/3/library/logging.html#logrecord-attributes).
                 By default `%(message)s | %(name)s` will be used and passed to
                 the parent [`__init__`][logging.Formatter]. If any custom string
-                is passed, the `detail_threshold` and `prepend_level_name`
-                arguments will be ignored and that string is passed through
-                unchanged to the parent [`__init__`][logging.Formatter].
+                is passed, the `detail_threshold` argument will be ignored and
+                that string is passed through unchanged to the parent
+                [`__init__`][logging.Formatter].
             datefmt (optional):
                 Passed through to the parent [`__init__`][logging.Formatter].
             style (optional):
@@ -116,15 +115,8 @@ class SyslogFormatter(Formatter):
                 Any log message with log level greater or equal to this value
                 will have information appended to it about the module, function
                 and line number, where the log record was made. The suffix will
-                have the form ` | {module}.{function}.{line}`.
+                have the form ` | %(module)s.%(funcName)s.%(lineno)d`.
                 Defaults to `logging.WARNING`.
-                If `fmt` is passed, this argument will be ignored.
-            prepend_level_name (optional):
-                If `True`, the log level name will be prepended to every log
-                message (but _after_ the `syslog` PRI part). The prefix will
-                have the form `{levelname} | ` (with a fixed width of 8
-                characters of the part before the `|`).
-                Defaults to `True`.
                 If `fmt` is passed, this argument will be ignored.
 
         Raises:
@@ -137,7 +129,6 @@ class SyslogFormatter(Formatter):
         self._facility = facility
         self._line_break_repl = line_break_repl
         self._detail_threshold = normalize_log_level(detail_threshold)
-        self._prepend_level_name = prepend_level_name
         if fmt is None:
             self._custom_fmt = False
             fmt = DEFAULT_FORMAT[style]
@@ -155,8 +146,8 @@ class SyslogFormatter(Formatter):
         Ensures that line-breaks in the exception message are replaced to ensure
         it fits into a single line, unless this behavior was disabled.
 
-        Depending on the constructor arguments used when creating the instance,
-        additional information may be added to the message.
+        Unless a custom format was defined when creating the instance,
+        additional details will be appended to the message.
 
         Args:
             record: The [`logging.LogRecord`][] to format as text
@@ -168,8 +159,6 @@ class SyslogFormatter(Formatter):
 
         # Prepend syslog PRI:
         message = get_syslog_pri_part(record.levelno, self._facility)
-        if not self._custom_fmt and self._prepend_level_name:
-            message += f"{record.levelname:<8}| "
         message += self.formatMessage(record)
 
         # If record level exceeds the threshold, append additional details

@@ -27,15 +27,13 @@ def test_formatter_default() -> None:
     try:
         raise ValueError("this is bad")
     except ValueError:
-        log.exception("oh no")
+        log.exception("oof")
 
     output_lines = log_stream.getvalue().splitlines()
-    assert output_lines[0] == "<15>DEBUG   | foo | root"
-    assert output_lines[1] == "<14>INFO    | bar | root"
-    assert output_lines[2] == f"<12>WARNING | baz | root | {mod_func}.26"
-    assert output_lines[3].startswith(
-        f"<11>ERROR   | oh no | root | {mod_func}.30 --> "
-    )
+    assert output_lines[0] == "<15>foo | root"
+    assert output_lines[1] == "<14>bar | root"
+    assert output_lines[2] == f"<12>baz | root | {mod_func}.26"
+    assert output_lines[3].startswith(f"<11>oof | root | {mod_func}.30 --> ")
     assert "Traceback" in output_lines[3]
     assert output_lines[3].endswith(" --> ValueError: this is bad")
 
@@ -52,7 +50,6 @@ def test_formatter_with_config() -> None:
                 "facility": facility,
                 "line_break_repl": "🤡",
                 "detail_threshold": "INFO",
-                "prepend_level_name": False,
             }
         },
         "handlers": {
@@ -76,10 +73,10 @@ def test_formatter_with_config() -> None:
 
     output_lines = log_stream.getvalue().splitlines()
     assert output_lines[0] == f"<{facility * 8 + 7}>foo | root"
-    assert output_lines[1] == f"<{facility * 8 + 6}>bar | root | {mod_func}.70"
-    assert output_lines[2] == f"<{facility * 8 + 4}>baz | root | {mod_func}.71"
+    assert output_lines[1] == f"<{facility * 8 + 6}>bar | root | {mod_func}.67"
+    assert output_lines[2] == f"<{facility * 8 + 4}>baz | root | {mod_func}.68"
     assert output_lines[3].startswith(
-        f"<{facility * 8 + 3}>oh no | root | {mod_func}.75🤡"
+        f"<{facility * 8 + 3}>oh no | root | {mod_func}.72🤡"
     )
     assert "Traceback" in output_lines[3]
     assert output_lines[3].endswith("🤡ValueError: this is bad")

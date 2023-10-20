@@ -55,10 +55,10 @@ except ValueError as e:
 This will send the following to your stdout:
 
 ```
-<15>DEBUG   | foo | root
-<14>INFO    | bar | root
-<12>WARNING | baz | root | __init__.<module>.24
-<11>ERROR   | oof | root | __init__.<module>.28 --> Traceback (most recent call last): --> File "/path/to/module.py", line 26, in <module> --> raise ValueError("this is bad") --> ValueError: this is bad
+<15>foo | root
+<14>bar | root
+<12>baz | root | __init__.<module>.24
+<11>oof | root | __init__.<module>.28 --> Traceback (most recent call last): --> File "/path/to/module.py", line 26, in <module> --> raise ValueError("this is bad") --> ValueError: this is bad
 ```
 
 ### The `PRI` prefix
@@ -91,7 +91,6 @@ In addition to the usual <a href="https://docs.python.org/3/library/logging.html
 | `facility`            | The facility value to use for every log message                                                                                                                                                                                                    |     `1`     |
 | `line_break_repl`     | To prevent a single log message taking up more than one line, every line-break (and consecutive whitespace) is replaced with this string. Passing `None` disables this behavior.                                                                   |   ` --> `   |
 | `detail_threshold`    | Any log message with log level greater or equal to this value will have information appended to it about the module, function and line number, where the log record was made. If a custom message format is passed, this argument will be ignored. |  `WARNING`  |
-| `prepend_level_name`  | If `True`, the log level name will be prepended to every log message (but _after_ the `syslog` PRI part). If a custom message format is passed, this argument will be ignored.                                                                     |   `True`    |
 
 ### Extended configuration example
 
@@ -105,8 +104,8 @@ log_config = {
     "formatters": {
         "my_syslog_formatter": {
             "()": "syslogformat.SyslogFormatter",
-            "format": "$message [$name]",
-            "style": "$",
+            "format": "{levelname:<8}{message} [{name}]",
+            "style": "{",
             "facility": 16,
             "line_break_repl": " 🚀 ",
         }
@@ -135,10 +134,10 @@ except ValueError as e:
 Output:
 
 ```
-<135>foo [root]
-<134>bar [root]
-<132>baz [root]
-<131>oof [root] 🚀 Traceback (most recent call last): 🚀 File "/path/to/module.py", line 30, in <module> 🚀 raise ValueError("this is bad") 🚀 ValueError: this is bad
+<135>DEBUG   foo [root]
+<134>INFO    bar [root]
+<132>WARNING baz [root]
+<131>ERROR   oof [root] 🚀 Traceback (most recent call last): 🚀 File "/path/to/module.py", line 30, in <module> 🚀 raise ValueError("this is bad") 🚀 ValueError: this is bad
 ```
 
 ## Dependencies

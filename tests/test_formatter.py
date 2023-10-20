@@ -28,12 +28,10 @@ def test___init__(mock_base___init__: MagicMock) -> None:
         facility=facility,
         line_break_repl=" ",
         detail_threshold=detail_threshold,
-        prepend_level_name=False,
     )
     assert formatter._facility == facility
     assert formatter._line_break_repl == " "
     assert formatter._detail_threshold == detail_threshold
-    assert formatter._prepend_level_name is False
     assert formatter._custom_fmt is True
     if sys.version_info >= (3, 10):
         mock_base___init__.assert_called_once_with(
@@ -72,11 +70,10 @@ def mock_get_syslog_pri_part() -> Iterator[MagicMock]:
 @pytest.fixture
 def make_syslog_formatter() -> Callable[[str], SyslogFormatter]:
     def _make_syslog_formatter(line_break_repl: str) -> SyslogFormatter:
-        formatter = SyslogFormatter("%(message)s")
+        formatter = SyslogFormatter("{message}", style="{")
         formatter._facility = TEST_FACILITY
         formatter._line_break_repl = line_break_repl
         formatter._detail_threshold = WARNING
-        formatter._prepend_level_name = False
         formatter._custom_fmt = False
         return formatter
 
@@ -155,29 +152,6 @@ def test_format__threshold_exceeded(
     mock_get_syslog_pri_part.assert_called_once_with(INFO, TEST_FACILITY)
 
 
-def test_format__prepend_level_name(
-    mock_get_syslog_pri_part: MagicMock,
-    make_syslog_formatter: Callable[[str], SyslogFormatter],
-    make_log_record: LogRecordFixture,
-) -> None:
-    formatter = make_syslog_formatter("💡")
-    msg = "abc\n  xyz"
-    log_record = make_log_record(INFO, msg)
-    formatter._prepend_level_name = True
-
-    output = formatter.format(log_record)
-    assert output == f"{TEST_PRI}INFO    | abc💡xyz"
-    mock_get_syslog_pri_part.assert_called_once_with(INFO, TEST_FACILITY)
-    mock_get_syslog_pri_part.reset_mock()
-
-    # Check that spacing for level name prefix is fixed:
-    log_record = make_log_record(DEBUG, msg)
-
-    output = formatter.format(log_record)
-    assert output == f"{TEST_PRI}DEBUG   | abc💡xyz"
-    mock_get_syslog_pri_part.assert_called_once_with(DEBUG, TEST_FACILITY)
-
-
 def test_format__with_exception(
     mock_get_syslog_pri_part: MagicMock,
     make_syslog_formatter: Callable[[str], SyslogFormatter],
@@ -197,7 +171,6 @@ def test_format__with_exception(
     mock_get_syslog_pri_part.reset_mock()
 
     # Check that detail comes before exception text:
-    formatter._prepend_level_name = False
     formatter._detail_threshold = DEBUG
     detail = f"{log_record.module}.{log_record.funcName}.{log_record.lineno}"
 
@@ -215,7 +188,6 @@ def test_format__custom_formatting_override(
     exc_info, exc_text = exc_info_and_text
     formatter = make_syslog_formatter("🧱")
     formatter._custom_fmt = True
-    formatter._prepend_level_name = True
     formatter._detail_threshold = WARNING
     exc_text_fmt = re.sub(r"(?:\r\n|\r|\n)\s*", "🧱", exc_text)
     msg = "abc\n  xyz"
