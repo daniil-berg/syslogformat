@@ -140,6 +140,11 @@ Output:
 <131>ERROR   oof [root] 🚀 Traceback (most recent call last): 🚀 File "/path/to/module.py", line 30, in <module> 🚀 raise ValueError("this is bad") 🚀 ValueError: this is bad
 ```
 
+Since the facility was set to `16`, the PRI code ends up being `16 * 8 + 7 == 135` for `DEBUG` level messages and `16 * 8 + 3 == 131` for `ERROR` messages.
+
+Because a custom format was specified, it will never be modified, regardless of a message's log level.
+Exception texts are of course still appended, when the `exception` log method is called (or the `exc_info` argument is passed), but the custom `line_break_repl` here is used for reformatting those texts.
+
 ## Dependencies
 
 Python `3.8` or greater, OS agnostic
