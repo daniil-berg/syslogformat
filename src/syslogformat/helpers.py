@@ -60,7 +60,7 @@ def get_syslog_pri_part(log_level: int, facility: int = USER) -> str:
         log_level:
             A **Python** log level number. The corresponding severity value will
             be determined and used to calculate the PRI value.
-        facility (optional):
+        facility:
             The `syslog` facility code.
             Defaults to `syslogformat.facility.USER`.
 

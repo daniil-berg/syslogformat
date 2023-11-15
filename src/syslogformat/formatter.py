@@ -77,7 +77,7 @@ class SyslogFormatter(Formatter):
         provide full explanations.
 
         Args:
-            fmt (optional):
+            fmt:
                 A format string in the given `style` for the logged output as a
                 whole. The possible mapping keys are drawn from the
                 `logging.LogRecord` object's
@@ -86,11 +86,11 @@ class SyslogFormatter(Formatter):
                 the parent [`__init__`][logging.Formatter]. If any custom string
                 is passed, that string is passed through unchanged to the parent
                 [`__init__`][logging.Formatter].
-            datefmt (optional):
+            datefmt:
                 Passed through to the parent [`__init__`][logging.Formatter].
-            style (optional):
+            style:
                 Passed through to the parent [`__init__`][logging.Formatter].
-            validate (optional):
+            validate:
                 If `True` (default), incorrect or mismatched `fmt` and `style`
                 will raise a `ValueError`; for example,
                 `logging.Formatter('%(asctime)s - %(message)s', style='{')`.
@@ -99,10 +99,10 @@ class SyslogFormatter(Formatter):
                 [`NonStandardSyslogFacility`][syslogformat.exceptions.NonStandardSyslogFacility]
                 error. The argument is always passed through to the parent
                 [`__init__`][logging.Formatter].
-            defaults (optional):
+            defaults:
                 Passed through to the parent [`__init__`][logging.Formatter]
                 on Python `>=3.10`. Ignored on Python `<3.10`.
-            facility (optional):
+            facility:
                 Used to calculate the number in the PRI part at the very start
                 of each log message. This argument should be an integer between
                 0 and 24. The `facility` value is multiplied by 8 and added
@@ -112,7 +112,7 @@ class SyslogFormatter(Formatter):
                 [section 4.1.1](https://datatracker.ietf.org/doc/html/rfc3164#section-4.1.1)
                 of RFC 3164.
                 Defaults to [`USER`][syslogformat.facility.USER].
-            line_break_repl (optional):
+            line_break_repl:
                 To prevent a single log message taking up more than one line,
                 every line-break (and consecutive whitespace) in the final log
                 message will be replaced with the string provided here. This is
@@ -122,7 +122,7 @@ class SyslogFormatter(Formatter):
                 Passing `None` disables this behavior. This means the default
                 (multi-line) exception formatting will be used.
                 Defaults to `' --> '`.
-            level_formats (optional):
+            level_formats:
                 If provided a mapping of log level thresholds to format strings,
                 the formatter will prioritize the format with the highest level
                 threshold for all log records at or above that level.
