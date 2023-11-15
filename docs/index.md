@@ -12,6 +12,14 @@
 
 `pip install syslogformat`
 
+## Features
+
+- Produces log messages that comply with the [syslog][2] specification, prepending a valid [`PRI` prefix][9] that is parsed and interpreted by programs like **`systemd-journald`**.
+- Replaces line breaks to ensure each message renders as a single line, including error tracebacks and stack information.
+- Allows you to easily configure the syslog facility to assume.
+- Can be configured with different non-overlapping formats for different levels.
+- Lightweight with no third-party package requirements.
+
 ## Usage
 
 ### Basic configuration
