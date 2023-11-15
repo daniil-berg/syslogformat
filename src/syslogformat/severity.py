@@ -68,12 +68,25 @@ def log_level_severity(level_num: int) -> int:
     equivalent log level in the Python logging module to `NOTICE`, and
     `EMERGENCY` is unnecessary because no Python script should be able to cause
     such severe problems.
+    Therefore any number above [logging.CRITICAL][] passed will result in
+    [`ALERT`][syslogformat.severity.ALERT] being returned.
 
     Args:
         level_num: An integer representing a Python log level number
 
     Returns:
         One of the predefined severity codes that matches the given log level
+
+    Examples:
+        >>> import logging
+        >>> log_level_severity(logging.DEBUG)
+        7
+        >>> log_level_severity(logging.CRITICAL)
+        2
+        >>> log_level_severity(logging.CRITICAL + 1)
+        1
+        >>> log_level_severity(999_999)
+        1
     """
     for level_bound, severity in LOG_LEVEL_BOUND_SEVERITY:
         if level_num <= level_bound:

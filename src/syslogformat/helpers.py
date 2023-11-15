@@ -39,6 +39,12 @@ def normalize_log_level(level: int | str) -> int:
         InvalidLogLevel:
             If `level` is a string that is not present in the keys of the
             level-name-mapping of the `logging` module.
+
+    Examples:
+        >>> normalize_log_level(42)
+        42
+        >>> normalize_log_level("WARNING")
+        30
     """
     if isinstance(level, int):
         return level
@@ -59,12 +65,22 @@ def get_syslog_pri_part(log_level: int, facility: int = USER) -> str:
     Args:
         log_level:
             A **Python** log level number. The corresponding severity value will
-            be determined and used to calculate the PRI value.
+            be determined via the
+            [`log_level_severity`][syslogformat.severity.log_level_severity]
+            function and used to calculate the PRI value.
         facility:
             The `syslog` facility code.
             Defaults to `syslogformat.facility.USER`.
 
     Returns:
         A string of the PRI value enclosed in angle brackets.
+
+    Examples:
+        >>> import logging
+        >>> get_syslog_pri_part(logging.INFO)
+        <14>
+        >>> from syslogformat.facility import KERNEL
+        >>> get_syslog_pri_part(logging.DEBUG, KERNEL)
+        <7>
     """
     return f"<{facility * 8 + log_level_severity(log_level)}>"
