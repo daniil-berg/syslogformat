@@ -6,6 +6,8 @@ a[href]:where(
   [href*="//"]:not(
     [href*="//localhost"],
     [href*="//github.com"],
+    [href*="//apache.org"],
+    [href*="//pypi.org"],
     [href*="//daniil-berg.github.io"],
     [href*="//squidfunk.github.io"]
   )

@@ -641,6 +641,9 @@
 
 
 <h1 id="syslogformat">syslogformat<a class="headerlink" href="#syslogformat" title="Permanent link">&para;</a></h1>
+<p><a href="https://github.com/daniil-berg/syslogformat/commits"><img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/daniil-berg/syslogformat?label=Last%20commit&amp;logo=git" /></a>
+<a href="https://apache.org/licenses/LICENSE-2.0"><img alt="License: Apache-2.0" src="https://img.shields.io/badge/Apache-2.0-darkred.svg?logo=apache" /></a>
+<a href="https://pypi.org/project/syslogformat/"><img alt="PyPI version" src="https://img.shields.io/pypi/v/syslogformat?color=teal&amp;logo=pypi" /></a></p>
 <p><strong>Python <a href="https://docs.python.org/3/library/logging.html#formatter-objects"><code>logging.Formatter</code></a> class for <a href="https://datatracker.ietf.org/doc/html/rfc3164#section-4.1">syslog</a> style messages</strong></p>
 <hr />
 <p><a href="https://daniil-berg.github.io/syslogformat">📑 Documentation</a> &nbsp; | &nbsp; <a href="https://github.com/daniil-berg/syslogformat">🧑‍💻 Source Code</a> &nbsp; | &nbsp; <a href="https://github.com/daniil-berg/syslogformat/issues">🐛 Bug Tracker</a></p>
@@ -697,7 +700,7 @@ The <code>PRI</code> code is calculated by multiplying the facility by 8 and add
 Since a <code>DEBUG</code> log message corresponds to a severity of <code>7</code>, the resulting <code>PRI</code> part of the first log message in the example above is <code>&lt;15&gt;</code> (since <code>1 * 8 + 7 == 15</code>).
 An <code>ERROR</code> has the severity <code>3</code>, so that message has the <code>PRI</code> part <code>&lt;11&gt;</code>.</p>
 <h3 id="default-message-format">Default message format<a class="headerlink" href="#default-message-format" title="Permanent link">&para;</a></h3>
-<p>By default the message format of the <code>SyslogFormatter</code> is <code>%(message)s | %(name)s</code> (and equivalent for <code>$</code> or <code>{</code> styles).</p>
+<p>By default the message format of the <code>SyslogFormatter</code> is <code>%(message)s | %(name)s</code> (and equivalent for <code>$</code> or <code>{</code> <a href="https://docs.python.org/3/howto/logging-cookbook.html#formatting-styles">styles</a>).</p>
 <p>In addition, all line-breaks (including those in the exception traceback) are replaced with <code>--&gt;</code> by default.</p>
 <p>All of this can be easily changed and configured to fit your needs (see below).</p>
 <h3 id="configuration-options">Configuration options<a class="headerlink" href="#configuration-options" title="Permanent link">&para;</a></h3>
