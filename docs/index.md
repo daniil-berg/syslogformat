@@ -1,10 +1,10 @@
 # syslogformat
 
-**Python <a href="https://docs.python.org/3/library/logging.html#formatter-objects" target="_blank">`logging.Formatter`</a> class for <a href="https://datatracker.ietf.org/doc/html/rfc3164#section-4.1" target="_blank">syslog</a> style messages**
+**Python [`logging.Formatter`][1] class for [syslog][2] style messages**
 
 ---
 
-[📑 Documentation][1] &nbsp; | &nbsp; [🧑‍💻 Source Code][2] &nbsp; | &nbsp; [🐛 Bug Tracker][3]
+[📑 Documentation][3] &nbsp; | &nbsp; [🧑‍💻 Source Code][4] &nbsp; | &nbsp; [🐛 Bug Tracker][5]
 
 ---
 
@@ -17,9 +17,9 @@
 ### Basic configuration
 
 As is the case with any logging formatter setup, you need to use the special `()` key to indicate the custom class to use.
-(See the <a href="https://docs.python.org/3/library/logging.config.html#dictionary-schema-details" target="_blank">Dictionary Schema Details</a> and <a href="https://docs.python.org/3/library/logging.config.html#logging-config-dict-userdef" target="_blank">User-defined objects</a> sections in the official `logging.config` documentation.)
+(See the [Dictionary Schema Details][6] and [User-defined objects][7] sections in the official `logging.config` documentation.)
 
-For example, you could use the following config dictionary, pass it to the <a href="https://docs.python.org/3/library/logging.config.html#logging.config.dictConfig" target="_blank">`logging.config.dictConfig`</a> function, and start logging like this:
+For example, you could use the following config dictionary, pass it to the [`logging.config.dictConfig`][8] function, and start logging like this:
 
 ```python hl_lines="7"
 import logging.config
@@ -63,7 +63,7 @@ This will send the following to your stdout:
 
 ### The `PRI` prefix
 
-To adhere to the `syslog` standard outlined in RFC 3164, every log message must begin with the so called <a href="https://datatracker.ietf.org/doc/html/rfc3164#section-4.1.1" target="_blank">`PRI` part</a>.
+To adhere to the `syslog` standard outlined in RFC 3164, every log message must begin with the so called [`PRI` part][9].
 This is a code enclosed in angle brackets that indicates the **facility** generating the message and **severity** of the event.
 The facility is encoded as an integer between 0 and 23 and the severity is encoded as an integer between 0 and 7.
 The `PRI` code is calculated by multiplying the facility by 8 and adding the severity.
@@ -84,7 +84,7 @@ All of this can be easily changed and configured to fit your needs (see below).
 
 ### Configuration options
 
-In addition to the usual <a href="https://docs.python.org/3/library/logging.html#logging.Formatter" target="_blank">formatter options</a>, the `SyslogFormatter` provides the following parameters:
+In addition to the usual [formatter options][10], the `SyslogFormatter` provides the following parameters:
 
 | Parameter         | Description                                                                                                                                                                            | Default |
 |-------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------:|
@@ -92,9 +92,11 @@ In addition to the usual <a href="https://docs.python.org/3/library/logging.html
 | `line_break_repl` | To prevent a single log message taking up more than one line, every line-break (and consecutive whitespace) is replaced with this string. Passing `None` disables this behavior.       | ` --> ` |
 | `level_formats`   | If provided a mapping of log level thresholds to format strings, the formatter will prioritize the format with the highest level threshold for all log records at or above that level. | `None`  |
 
+For more details, check the API of the `SyslogFormatter` constructor in the [documentation][3].
+
 ### Extended configuration example
 
-Here is an example using a <a href="https://docs.python.org/3/library/logging.html#logrecord-attributes" target="_blank">custom message format</a> and specifying a different facility and line break replacement:
+Here is an example using a [custom message format][11] and specifying a different facility and line break replacement:
 
 ```python hl_lines="8-11"
 import logging.config
@@ -149,6 +151,14 @@ Exception texts are of course still appended, when the `exception` log method is
 Python `3.8` or greater, OS agnostic
 
 
-[1]: https://daniil-berg.github.io/syslogformat
-[2]: https://github.com/daniil-berg/syslogformat
-[3]: https://github.com/daniil-berg/syslogformat/issues
+[1]:  https://docs.python.org/3/library/logging.html#formatter-objects
+[2]:  https://datatracker.ietf.org/doc/html/rfc3164#section-4.1
+[3]:  https://daniil-berg.github.io/syslogformat
+[4]:  https://github.com/daniil-berg/syslogformat
+[5]:  https://github.com/daniil-berg/syslogformat/issues
+[6]:  https://docs.python.org/3/library/logging.config.html#dictionary-schema-details
+[7]:  https://docs.python.org/3/library/logging.config.html#logging-config-dict-userdef
+[8]:  https://docs.python.org/3/library/logging.config.html#logging.config.dictConfig
+[9]:  https://datatracker.ietf.org/doc/html/rfc3164#section-4.1.1
+[10]: https://docs.python.org/3/library/logging.html#logging.Formatter
+[11]: https://docs.python.org/3/library/logging.html#logrecord-attributes
