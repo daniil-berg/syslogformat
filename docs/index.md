@@ -76,7 +76,7 @@ An `ERROR` has the severity `3`, so that message has the `PRI` part `<11>`.
 
 ### Default message format
 
-By default the message format of the `SyslogFormatter` is `%(message)s | %(name)s` (and equivalent for `$` or `{` styles).
+By default the message format of the `SyslogFormatter` is `%(message)s | %(name)s` (and equivalent for `$` or `{` [styles][10]).
 
 In addition, all line-breaks (including those in the exception traceback) are replaced with ` --> ` by default.
 
@@ -84,7 +84,7 @@ All of this can be easily changed and configured to fit your needs (see below).
 
 ### Configuration options
 
-In addition to the usual [formatter options][10], the `SyslogFormatter` provides the following parameters:
+In addition to the usual [formatter options][11], the `SyslogFormatter` provides the following parameters:
 
 | Parameter         | Description                                                                                                                                                                            | Default |
 |-------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------:|
@@ -96,7 +96,7 @@ For more details, check the API of the `SyslogFormatter` constructor in the [doc
 
 ### Extended configuration example
 
-Here is an example using a [custom message format][11] and specifying a different facility and line break replacement:
+Here is an example using a [custom message format][12] and specifying a different facility and line break replacement:
 
 ```python hl_lines="8-11"
 import logging.config
@@ -162,5 +162,6 @@ Exception texts are of course still appended, when the `exception` log method is
 [7]:  https://docs.python.org/3/library/logging.config.html#logging-config-dict-userdef
 [8]:  https://docs.python.org/3/library/logging.config.html#logging.config.dictConfig
 [9]:  https://datatracker.ietf.org/doc/html/rfc3164#section-4.1.1
-[10]: https://docs.python.org/3/library/logging.html#logging.Formatter
-[11]: https://docs.python.org/3/library/logging.html#logrecord-attributes
+[10]: https://docs.python.org/3/howto/logging-cookbook.html#formatting-styles
+[11]: https://docs.python.org/3/library/logging.html#logging.Formatter
+[12]: https://docs.python.org/3/library/logging.html#logrecord-attributes
