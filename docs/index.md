@@ -1,5 +1,9 @@
 # syslogformat
 
+[![GitHub last commit][github-last-commit-img]][github-last-commit]
+[![License: Apache-2.0][apache2-img]][apache2]
+[![PyPI version][pypi-latest-version-img]][pypi-latest-version]
+
 **Python [`logging.Formatter`][1] class for [syslog][2] style messages**
 
 ---
@@ -152,6 +156,13 @@ Exception texts are of course still appended, when the `exception` log method is
 - No third-party dependencies
 - OS agnostic
 
+
+[github-last-commit]: https://github.com/daniil-berg/syslogformat/commits
+[github-last-commit-img]: https://img.shields.io/github/last-commit/daniil-berg/syslogformat?label=Last%20commit&logo=git
+[apache2]: https://apache.org/licenses/LICENSE-2.0
+[apache2-img]: https://img.shields.io/badge/Apache-2.0-darkred.svg?logo=apache
+[pypi-latest-version]: https://pypi.org/project/syslogformat/
+[pypi-latest-version-img]: https://img.shields.io/pypi/v/syslogformat?color=teal&logo=pypi
 
 [1]:  https://docs.python.org/3/library/logging.html#formatter-objects
 [2]:  https://datatracker.ietf.org/doc/html/rfc3164#section-4.1
