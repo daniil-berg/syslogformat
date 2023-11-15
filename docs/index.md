@@ -1,16 +1,12 @@
 # syslogformat
 
+**Python [`logging.Formatter`][1] class for [syslog][2] style messages**
+
 [![GitHub last commit][github-last-commit-img]][github-last-commit]
 [![License: Apache-2.0][apache2-img]][apache2]
 [![PyPI version][pypi-latest-version-img]][pypi-latest-version]
 
-**Python [`logging.Formatter`][1] class for [syslog][2] style messages**
-
----
-
 [📑 Documentation][3] &nbsp; | &nbsp; [🧑‍💻 Source Code][4] &nbsp; | &nbsp; [🐛 Bug Tracker][5]
-
----
 
 ## Installation
 
