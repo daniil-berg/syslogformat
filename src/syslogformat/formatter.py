@@ -204,6 +204,7 @@ class SyslogFormatter(Formatter):
 
         If different level styles have been set, the one mapped to the highest
         level at or below that of the `record` will be used to format it.
+
         Otherwise the parent method is called.
 
         Args:
@@ -224,8 +225,22 @@ class SyslogFormatter(Formatter):
         Ensures that line-breaks in the exception message are replaced to ensure
         it fits into a single line, unless this behavior was disabled.
 
-        Unless a custom format was defined when creating the instance,
-        additional details will be appended to the message.
+        The rest of the logic is the same as in the
+        [parent method][logging.Formatter.format].
+        The record's attribute dictionary is used as the operand to a string
+        formatting operation which yields the returned string. Before formatting
+        the dictionary, a couple of preparatory steps are carried out. The
+        `message` attribute of the record is computed using
+        [LogRecord.getMessage][logging.LogRecord.getMessage]. If the formatting
+        string uses the time (as determined by a call to `usesTime`),
+        [formatTime][logging.Formatter.formatTime] is called to format the event
+        time.
+        If there is exception information, it is formatted using
+        [formatException][logging.Formatter.formatException] and appended to the
+        message.
+        If stack information is available, it is appended after the exception
+        information, using [formatStack][logging.Formatter.formatStack]
+        to transform it if necessary.
 
         Args:
             record: The [`logging.LogRecord`][] to format as text
