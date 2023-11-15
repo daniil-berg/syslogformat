@@ -42,7 +42,7 @@ def normalize_log_level(level: int | str) -> int:
     """
     if isinstance(level, int):
         return level
-    level_num = get_level_name_mapping().get(level)
+    level_num = get_level_name_mapping().get(level.upper())
     if level_num is None:
         raise InvalidLogLevel(level)
     return level_num
