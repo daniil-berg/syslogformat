@@ -17,7 +17,7 @@ def test_log_level_severity() -> None:
 
     with patch.object(
         severity,
-        "LOG_LEVEL_BOUND_SEVERITY",
+        "_LOG_LEVEL_BOUND_SEVERITY",
         new=[],
     ), pytest.raises(AssertionError):
         severity.log_level_severity(10)

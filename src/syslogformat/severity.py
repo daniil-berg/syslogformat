@@ -18,31 +18,37 @@ __all__ = [
     "EMERGENCY",
     "ERROR",
     "INFORMATIONAL",
-    "LOG_LEVEL_BOUND_SEVERITY",
     "NOTICE",
     "WARNING",
     "log_level_severity",
 ]
 
 EMERGENCY = 0
-""""""
+"""System is unusable"""
+
 ALERT = 1
-""""""
+"""Action must be taken immediately"""
+
 CRITICAL = 2
-""""""
+"""Critical conditions"""
+
 ERROR = 3
-""""""
+"""Error conditions"""
+
 WARNING = 4
-""""""
+"""Warning conditions"""
+
 NOTICE = 5
-""""""
+"""Normal but significant condition"""
+
 INFORMATIONAL = 6
-""""""
+"""Informational messages"""
+
 DEBUG = 7
-""""""
+"""Debug-level messages"""
 
 
-LOG_LEVEL_BOUND_SEVERITY: Tuple[Tuple[float, int], ...] = (
+_LOG_LEVEL_BOUND_SEVERITY: Tuple[Tuple[float, int], ...] = (
     (logging.DEBUG, DEBUG),
     (logging.INFO, INFORMATIONAL),
     (logging.WARNING, WARNING),
@@ -88,7 +94,7 @@ def log_level_severity(level_num: int) -> int:
         >>> log_level_severity(999_999)
         1
     """
-    for level_bound, severity in LOG_LEVEL_BOUND_SEVERITY:
+    for level_bound, severity in _LOG_LEVEL_BOUND_SEVERITY:
         if level_num <= level_bound:
             return severity
     raise CodeShouldBeUnreachable
