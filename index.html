@@ -309,6 +309,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#features" class="md-nav__link">
+    Features
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#usage" class="md-nav__link">
     Usage
   </a>
@@ -568,6 +575,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#features" class="md-nav__link">
+    Features
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#usage" class="md-nav__link">
     Usage
   </a>
@@ -648,6 +662,14 @@
 <p><a href="https://daniil-berg.github.io/syslogformat">📑 Documentation</a> &nbsp; | &nbsp; <a href="https://github.com/daniil-berg/syslogformat">🧑‍💻 Source Code</a> &nbsp; | &nbsp; <a href="https://github.com/daniil-berg/syslogformat/issues">🐛 Bug Tracker</a></p>
 <h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h2>
 <p><code>pip install syslogformat</code></p>
+<h2 id="features">Features<a class="headerlink" href="#features" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Produces log messages that comply with the <a href="https://datatracker.ietf.org/doc/html/rfc3164#section-4.1">syslog</a> specification, prepending a valid <a href="https://datatracker.ietf.org/doc/html/rfc3164#section-4.1.1"><code>PRI</code> prefix</a> that is parsed and interpreted by programs like <strong><code>systemd-journald</code></strong>.</li>
+<li>Replaces line breaks to ensure each message renders as a single line, including error tracebacks and stack information.</li>
+<li>Allows you to easily configure the syslog facility to assume.</li>
+<li>Can be configured with different non-overlapping formats for different levels.</li>
+<li>Lightweight with no third-party package requirements.</li>
+</ul>
 <h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h2>
 <h3 id="basic-configuration">Basic configuration<a class="headerlink" href="#basic-configuration" title="Permanent link">&para;</a></h3>
 <p>As is the case with any logging formatter setup, you need to use the special <code>()</code> key to indicate the custom class to use.
