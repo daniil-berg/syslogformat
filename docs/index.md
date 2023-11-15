@@ -148,7 +148,9 @@ Exception texts are of course still appended, when the `exception` log method is
 
 ## Dependencies
 
-Python `3.8` or greater, OS agnostic
+- Python `>=3.8` `<=3.12`
+- No third-party dependencies
+- OS agnostic
 
 
 [1]:  https://docs.python.org/3/library/logging.html#formatter-objects
