@@ -82,6 +82,7 @@ class SyslogFormatter(Formatter):
                 whole. The possible mapping keys are drawn from the
                 `logging.LogRecord` object's
                 [attributes](https://docs.python.org/3/library/logging.html#logrecord-attributes).
+
                 By default `%(message)s | %(name)s` will be used and passed to
                 the parent [`__init__`][logging.Formatter]. If any custom string
                 is passed, that string is passed through unchanged to the parent
@@ -94,6 +95,7 @@ class SyslogFormatter(Formatter):
                 If `True` (default), incorrect or mismatched `fmt` and `style`
                 will raise a `ValueError`; for example,
                 `logging.Formatter('%(asctime)s - %(message)s', style='{')`.
+
                 Also, if `True`, a non-standard `facility` value (i.e. not
                 between 0 and 24) will raise a
                 [`NonStandardSyslogFacility`][syslogformat.exceptions.NonStandardSyslogFacility]
@@ -108,6 +110,7 @@ class SyslogFormatter(Formatter):
                 0 and 24. The `facility` value is multiplied by 8 and added
                 to the numerical value of the severity that corresponds to the
                 log level of the message.
+
                 Details about accepted numerical values can be found in
                 [section 4.1.1](https://datatracker.ietf.org/doc/html/rfc3164#section-4.1.1)
                 of RFC 3164.
@@ -119,13 +122,16 @@ class SyslogFormatter(Formatter):
                 useful because log records that include exception information
                 for example normally result in the multi-line traceback being
                 included in the log message.
+
                 Passing `None` disables this behavior. This means the default
                 (multi-line) exception formatting will be used.
+
                 Defaults to `' --> '`.
             level_formats:
                 If provided a mapping of log level thresholds to format strings,
                 the formatter will prioritize the format with the highest level
                 threshold for all log records at or above that level.
+
                 For example, say you pass the following dictionary:
                 ```python
                 {"WARNING": "foo %(message)s",
@@ -136,10 +142,12 @@ class SyslogFormatter(Formatter):
                 `WARNING` or higher but below `ERROR` will be formatted with the
                 `foo %(message)s` format; those with a level below `WARNING`
                 will use the normal format provided via the `fmt` argument.
+
                 The order of the provided mapping is irrelevant.
                 If such a mapping is passed, the formats _should_ conform to the
                 specified `style`, just like the `fmt` argument; if any of them
                 does not **and** `validate` is `True`, a `ValueError` is raised.
+
                 If passed `None` (default) or an empty mapping, the formatter
                 will use the normal provided `fmt` for all log messages.
 
