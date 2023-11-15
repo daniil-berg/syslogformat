@@ -1,0 +1,15 @@
+.md-typeset code {
+    word-break: keep-all;
+}
+
+a[href]:where(
+  [href*="//"]:not(
+    [href*="//localhost"],
+    [href*="//github.com"],
+    [href*="//daniil-berg.github.io"],
+    [href*="//squidfunk.github.io"]
+  )
+):after {
+  content: "\00A0↗️";
+  font-size: smaller;
+}
