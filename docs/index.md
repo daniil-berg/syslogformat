@@ -57,8 +57,8 @@ This will send the following to your stdout:
 ```
 <15>foo | root
 <14>bar | root
-<12>baz | root | __init__.<module>.24
-<11>oof | root | __init__.<module>.28 --> Traceback (most recent call last): --> File "/path/to/module.py", line 26, in <module> --> raise ValueError("this is bad") --> ValueError: this is bad
+<12>baz | root
+<11>oof | root --> Traceback (most recent call last): --> File "/path/to/module.py", line 26, in <module> --> raise ValueError("this is bad") --> ValueError: this is bad
 ```
 
 ### The `PRI` prefix
@@ -76,7 +76,7 @@ An `ERROR` has the severity `3`, so that message has the `PRI` part `<11>`.
 
 ### Default message format
 
-By default the message format of the `SyslogFormatter` is `%(message)s | %(name)s` for messages with a log level below `WARNING`, and `%(message)s | %(name)s | %(module)s.%(funcName)s.%(lineno)s` for messages with a higher log level.
+By default the message format of the `SyslogFormatter` is `%(message)s | %(name)s` (and equivalent for `$` or `{` styles).
 
 In addition, all line-breaks (including those in the exception traceback) are replaced with ` --> ` by default.
 
@@ -86,15 +86,15 @@ All of this can be easily changed and configured to fit your needs (see below).
 
 In addition to the usual <a href="https://docs.python.org/3/library/logging.html#logging.Formatter" target="_blank">formatter options</a>, the `SyslogFormatter` provides the following parameters:
 
-| Parameter             | Description                                                                                                                                                                                                                                        |   Default   |
-|-----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-----------:|
-| `facility`            | The facility value to use for every log message                                                                                                                                                                                                    |     `1`     |
-| `line_break_repl`     | To prevent a single log message taking up more than one line, every line-break (and consecutive whitespace) is replaced with this string. Passing `None` disables this behavior.                                                                   |   ` --> `   |
-| `detail_threshold`    | Any log message with log level greater or equal to this value will have information appended to it about the module, function and line number, where the log record was made. If a custom message format is passed, this argument will be ignored. |  `WARNING`  |
+| Parameter         | Description                                                                                                                                                                            | Default |
+|-------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------:|
+| `facility`        | The facility value to use for every log message                                                                                                                                        |   `1`   |
+| `line_break_repl` | To prevent a single log message taking up more than one line, every line-break (and consecutive whitespace) is replaced with this string. Passing `None` disables this behavior.       | ` --> ` |
+| `level_formats`   | If provided a mapping of log level thresholds to format strings, the formatter will prioritize the format with the highest level threshold for all log records at or above that level. | `None`  |
 
 ### Extended configuration example
 
-Here is an example using a <a href="https://docs.python.org/3/library/logging.html#logrecord-attributes" target="_blank">custom message format</a> and a different facility and line break replacement:
+Here is an example using a <a href="https://docs.python.org/3/library/logging.html#logrecord-attributes" target="_blank">custom message format</a> and specifying a different facility and line break replacement:
 
 ```python hl_lines="8-11"
 import logging.config
@@ -142,7 +142,6 @@ Output:
 
 Since the facility was set to `16`, the PRI code ends up being `16 * 8 + 7 == 135` for `DEBUG` level messages and `16 * 8 + 3 == 131` for `ERROR` messages.
 
-Because a custom format was specified, it will never be modified, regardless of a message's log level.
 Exception texts are of course still appended, when the `exception` log method is called (or the `exc_info` argument is passed), but the custom `line_break_repl` here is used for reformatting those texts.
 
 ## Dependencies

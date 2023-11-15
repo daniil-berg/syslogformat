@@ -54,3 +54,4 @@ nav:
     - api_reference/formatter.md
     - api_reference/helpers.md
     - api_reference/severity.md
+    - api_reference/types.md

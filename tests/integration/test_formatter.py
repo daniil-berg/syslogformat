@@ -12,7 +12,6 @@ log = logging.getLogger()
 
 
 def test_formatter_default() -> None:
-    mod_func = f"{THIS_MODULE}.{test_formatter_default.__name__}"
     log_stream = StringIO()
     stream_handler = logging.StreamHandler(stream=log_stream)
     syslog_formatter = SyslogFormatter()
@@ -32,14 +31,13 @@ def test_formatter_default() -> None:
     output_lines = log_stream.getvalue().splitlines()
     assert output_lines[0] == "<15>foo | root"
     assert output_lines[1] == "<14>bar | root"
-    assert output_lines[2] == f"<12>baz | root | {mod_func}.26"
-    assert output_lines[3].startswith(f"<11>oof | root | {mod_func}.30 --> ")
+    assert output_lines[2] == "<12>baz | root"
+    assert output_lines[3].startswith("<11>oof | root --> ")
     assert "Traceback" in output_lines[3]
     assert output_lines[3].endswith(" --> ValueError: this is bad")
 
 
 def test_formatter_with_config() -> None:
-    mod_func = f"{THIS_MODULE}.{test_formatter_with_config.__name__}"
     facility = 16
     log_stream = StringIO()
     log_config: Dict[str, Any] = {
@@ -47,9 +45,14 @@ def test_formatter_with_config() -> None:
         "formatters": {
             "syslog_test": {
                 "()": "syslogformat.SyslogFormatter",
+                "fmt": "{message}",
+                "style": "{",
                 "facility": facility,
                 "line_break_repl": "🤡",
-                "detail_threshold": "INFO",
+                "level_formats": {
+                    "WARNING": "{message} | {module}",
+                    "ERROR": "{message} | {module}.{lineno}",
+                },
             }
         },
         "handlers": {
@@ -72,34 +75,10 @@ def test_formatter_with_config() -> None:
         log.exception("oh no")
 
     output_lines = log_stream.getvalue().splitlines()
-    assert output_lines[0] == f"<{facility * 8 + 7}>foo | root"
-    assert output_lines[1] == f"<{facility * 8 + 6}>bar | root | {mod_func}.67"
-    assert output_lines[2] == f"<{facility * 8 + 4}>baz | root | {mod_func}.68"
-    assert output_lines[3].startswith(
-        f"<{facility * 8 + 3}>oh no | root | {mod_func}.72🤡"
-    )
-    assert "Traceback" in output_lines[3]
-    assert output_lines[3].endswith("🤡ValueError: this is bad")
-
-    # Now with a custom format override:
-    log_config["formatters"]["syslog_test"][
-        "format"
-    ] = "%(message)s🤡%(levelname)s"
-    logging.config.dictConfig(log_config)
-    log_stream.seek(0)
-
-    log.debug("foo")
-    log.info("bar")
-    log.warning("baz")
-    try:
-        raise ValueError("this is bad")
-    except ValueError:
-        log.exception("oh no")
-
-    output_lines = log_stream.getvalue().splitlines()
-    assert output_lines[0] == f"<{facility * 8 + 7}>foo🤡DEBUG"
-    assert output_lines[1] == f"<{facility * 8 + 6}>bar🤡INFO"
-    assert output_lines[2] == f"<{facility * 8 + 4}>baz🤡WARNING"
-    assert output_lines[3].startswith(f"<{facility * 8 + 3}>oh no🤡ERROR🤡")
+    fac = facility * 8
+    assert output_lines[0] == f"<{fac + 7}>foo"
+    assert output_lines[1] == f"<{fac + 6}>bar"
+    assert output_lines[2] == f"<{fac + 4}>baz | {THIS_MODULE}"
+    assert output_lines[3].startswith(f"<{fac + 3}>oh no | {THIS_MODULE}.75🤡")
     assert "Traceback" in output_lines[3]
     assert output_lines[3].endswith("🤡ValueError: this is bad")

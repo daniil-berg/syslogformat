@@ -4,23 +4,35 @@ from __future__ import annotations
 
 import re
 import sys
-from logging import WARNING, Formatter, LogRecord
-from typing import TYPE_CHECKING, Any, Mapping
+from logging import (
+    Formatter,
+    LogRecord,
+    PercentStyle,
+    StrFormatStyle,
+    StringTemplateStyle,
+)
+from typing import Dict
 
 from .exceptions import NonStandardSyslogFacility
 from .facility import USER
 from .helpers import get_syslog_pri_part, normalize_log_level
-
-if TYPE_CHECKING:
-    from typing_extensions import Literal
+from .types import (
+    AnyMap,
+    FormatterKwargs,
+    LevelFmtMap,
+    Style,
+    StyleKey,
+    StyleKwargs,
+)
 
 __all__ = ["SyslogFormatter"]
 
+
 LINE_BREAK_PATTERN = re.compile(r"(?:\r\n|\r|\n)\s*")
-DEFAULT_FORMAT = {
-    "%": "%(message)s | %(name)s",
-    "{": "{messages} | {name}",
-    "$": "${messages} | ${name}",
+STYLES_DEFAULT_FORMATS = {
+    "%": (PercentStyle, "%(message)s | %(name)s"),
+    "{": (StrFormatStyle, "{message} | {name}"),
+    "$": (StringTemplateStyle, "${message} | ${name}"),
 }
 
 
@@ -49,13 +61,13 @@ class SyslogFormatter(Formatter):
         self,
         fmt: str | None = None,
         datefmt: str | None = None,
-        style: Literal["%", "{", "$"] = "%",
+        style: StyleKey = "%",
         validate: bool = True,
         *,
-        defaults: Mapping[str, Any] | None = None,
+        defaults: AnyMap | None = None,
         facility: int = USER,
         line_break_repl: str | None = " --> ",
-        detail_threshold: int | str = WARNING,
+        level_formats: LevelFmtMap | None = None,
     ) -> None:
         """
         Validates the added formatter constructor arguments.
@@ -72,8 +84,7 @@ class SyslogFormatter(Formatter):
                 [attributes](https://docs.python.org/3/library/logging.html#logrecord-attributes).
                 By default `%(message)s | %(name)s` will be used and passed to
                 the parent [`__init__`][logging.Formatter]. If any custom string
-                is passed, the `detail_threshold` argument will be ignored and
-                that string is passed through unchanged to the parent
+                is passed, that string is passed through unchanged to the parent
                 [`__init__`][logging.Formatter].
             datefmt (optional):
                 Passed through to the parent [`__init__`][logging.Formatter].
@@ -111,33 +122,92 @@ class SyslogFormatter(Formatter):
                 Passing `None` disables this behavior. This means the default
                 (multi-line) exception formatting will be used.
                 Defaults to `' --> '`.
-            detail_threshold (optional):
-                Any log message with log level greater or equal to this value
-                will have information appended to it about the module, function
-                and line number, where the log record was made. The suffix will
-                have the form ` | %(module)s.%(funcName)s.%(lineno)d`.
-                Defaults to `logging.WARNING`.
-                If `fmt` is passed, this argument will be ignored.
+            level_formats (optional):
+                If provided a mapping of log level thresholds to format strings,
+                the formatter will prioritize the format with the highest level
+                threshold for all log records at or above that level.
+                For example, say you pass the following dictionary:
+                ```python
+                {"WARNING": "foo %(message)s",
+                 "ERROR":   "bar %(message)s"}
+                ```
+                Log records with the level `ERROR` or higher will be formatted
+                with the `bar %(message)s` format; records with a level of
+                `WARNING` or higher but below `ERROR` will be formatted with the
+                `foo %(message)s` format; those with a level below `WARNING`
+                will use the normal format provided via the `fmt` argument.
+                The order of the provided mapping is irrelevant.
+                If such a mapping is passed, the formats _should_ conform to the
+                specified `style`, just like the `fmt` argument; if any of them
+                does not **and** `validate` is `True`, a `ValueError` is raised.
+                If passed `None` (default) or an empty mapping, the formatter
+                will use the normal provided `fmt` for all log messages.
 
         Raises:
             NonStandardSyslogFacility:
                 If `validate` was set to `True` and the `facility` passed was
                 not an integer between 0 and 23.
+            ValueError:
+                If `validate` was set to `True` and the provided `fmt` or any of
+                the values in the `level_formats` mapping (if provided) do not
+                match the specified `style`.
         """
         if validate and facility not in range(24):
             raise NonStandardSyslogFacility(facility)
+        self._style_cls, default_format = STYLES_DEFAULT_FORMATS[style]
+        if fmt is None:
+            fmt = default_format
+        self._validate = validate
+        self._defaults = defaults
         self._facility = facility
         self._line_break_repl = line_break_repl
-        self._detail_threshold = normalize_log_level(detail_threshold)
-        if fmt is None:
-            self._custom_fmt = False
-            fmt = DEFAULT_FORMAT[style]
-        else:
-            self._custom_fmt = True
-        if sys.version_info < (3, 10):
-            super().__init__(fmt, datefmt, style, validate)
-        else:
-            super().__init__(fmt, datefmt, style, validate, defaults=defaults)
+        kwargs = FormatterKwargs(
+            fmt=fmt,
+            datefmt=datefmt,
+            style=style,
+            validate=validate,
+        )
+        if sys.version_info >= (3, 10):
+            kwargs["defaults"] = defaults
+        super().__init__(**kwargs)
+        self._level_styles = self._get_level_styles(level_formats or {})
+
+    def _get_style(self, fmt: str) -> Style:
+        """Constructs a style instance from a format string."""
+        style_kwargs = StyleKwargs(fmt=fmt)
+        if sys.version_info >= (3, 10):
+            style_kwargs["defaults"] = self._defaults
+        style_obj = self._style_cls(**style_kwargs)
+        if self._validate:
+            style_obj.validate()
+        return style_obj
+
+    def _get_level_styles(self, level_formats: LevelFmtMap) -> Dict[int, Style]:
+        """Constructs a sorted (desc.) dictionary of level => format style."""
+        level_styles = (
+            (normalize_log_level(level), self._get_style(level_fmt))
+            for level, level_fmt in level_formats.items()
+        )
+        return dict(sorted(level_styles, reverse=True))
+
+    def formatMessage(self, record: LogRecord) -> str:
+        """
+        Takes a log record and produces a formatted message from it.
+
+        If different level styles have been set, the one mapped to the highest
+        level at or below that of the `record` will be used to format it.
+        Otherwise the parent method is called.
+
+        Args:
+            record: The log record to format
+
+        Returns:
+            The formatted log message as text
+        """
+        for level_bound, style in self._level_styles.items():
+            if record.levelno >= level_bound:
+                return style.format(record)
+        return super().formatMessage(record)
 
     def format(self, record: LogRecord) -> str:
         """
@@ -161,10 +231,6 @@ class SyslogFormatter(Formatter):
         message = get_syslog_pri_part(record.levelno, self._facility)
         message += self.formatMessage(record)
 
-        # If record level exceeds the threshold, append additional details
-        if not self._custom_fmt and record.levelno >= self._detail_threshold:
-            message += f" | {record.module}.{record.funcName}.{record.lineno}"
-
         # Add exception/stack info:
         if record.exc_info and not record.exc_text:
             record.exc_text = self.formatException(record.exc_info).strip()
@@ -180,4 +246,4 @@ class SyslogFormatter(Formatter):
 
 
 # We must violate those because they are violated in the base `Formatter` class:
-# ruff: noqa: FBT001, FBT002, A003
+# ruff: noqa: FBT001, FBT002, A003, N802
